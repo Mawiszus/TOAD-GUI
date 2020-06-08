@@ -2,12 +2,20 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
 from PIL import ImageTk, Image
+import jnius_config
 import os
+import multiprocessing as mp
 
 from utils.scrollable_image import ScrollableImage
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level
 from utils.level_image_gen import LevelImageGen
 from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_obj
+
+
+MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "../Mario-AI-Framework"))
+os.environ["MARIO_AI_PATH"] = MARIO_AI_PATH
+jnius_config.add_classpath(os.path.join(MARIO_AI_PATH, "src"))
+import jnius
 
 
 class LevelObject:
@@ -92,7 +100,7 @@ def TOAD_GUI():
                                      defaultextension=".txt", filetypes=[("txt files", "*.txt")])
         if save_name is None:
             return  # saving was cancelled
-        text2save = ' '.join(level_obj.ascii_level)
+        text2save = ''.join(level_obj.ascii_level)
         save_name.write(text2save)
         save_name.close()
         return
@@ -117,8 +125,16 @@ def TOAD_GUI():
         return
 
     def play_level():
+        # try:
         print("Playing level!")
-        # TODO get Java hooked up to play a level
+        MarioGame = jnius.autoclass("engine.core.MarioGame")
+        game = MarioGame()
+        result = game.playGame(''.join(level_obj.ascii_level), 200)
+        # System = jnius.autoclass("java.lang.System")
+        # System.exit(0)
+        game.window.dispose()
+        # except Exception:
+        #     error_msg.set("Java Mario Framework crashed. Please check your installation.")
         return
 
     # Make layout
