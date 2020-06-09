@@ -148,8 +148,9 @@ def TOAD_GUI():
         game = gateway.jvm.engine.core.MarioGame()
         result = game.playGame(''.join(level_obj.ascii_level), 200)
         game.getWindow().dispose()
-        error_msg.set("Level Played. Completion Percentage: %d%%" % int(result.getCompletionPercentage() * 100))
+        perc = int(result.getCompletionPercentage() * 100)
         gateway.java_process.kill()
+        error_msg.set("Level Played. Completion Percentage: %d%%" % perc)
         return
 
     # Make layout
@@ -174,7 +175,8 @@ def TOAD_GUI():
 
     use_gen.trace("w", callback=set_button_state)
 
-    play_button = ttk.Button(settings, text='Play level', state='disabled', command=play_level)
+    p_c_frame = ttk.Frame(settings)
+    play_button = ttk.Button(p_c_frame, text='Play level', state='disabled', command=play_level)
 
     prev_label = ttk.Label(settings, text='Preview:')
     image_label = ScrollableImage(settings, image=levelimage)
@@ -189,6 +191,17 @@ def TOAD_GUI():
 
     is_loaded.trace("w", callback=set_play_state)
 
+    controls_frame = ttk.LabelFrame(p_c_frame, padding=(5, 5, 5, 5), text='Controls')
+    contr_a = ttk.Label(controls_frame, text=' a :')
+    contr_s = ttk.Label(controls_frame, text=' s :')
+    contr_l = ttk.Label(controls_frame, text='<- :')
+    contr_r = ttk.Label(controls_frame, text='-> :')
+
+    descr_a = ttk.Label(controls_frame, text='Sprint/Throw Fireball')
+    descr_s = ttk.Label(controls_frame, text='Jump')
+    descr_l = ttk.Label(controls_frame, text='Move left')
+    descr_r = ttk.Label(controls_frame, text='Move right')
+
     error_label = ttk.Label(settings, textvariable=error_msg)
 
     # Pack layout to grid
@@ -201,8 +214,20 @@ def TOAD_GUI():
     save_button.grid(column=2, row=3, sticky=(N, S, E, W), padx=5, pady=5)
     prev_label.grid(column=0, row=4, columnspan=4, sticky=(S, W), padx=5, pady=5)
     image_label.grid(column=0, row=5, columnspan=4, sticky=(N, E, W), padx=5, pady=5)
-    play_button.grid(column=1, row=6, columnspan=2,  sticky=(N, S, E, W), padx=5, pady=5)
+    p_c_frame.grid(column=1, row=6, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
     error_label.grid(column=0, row=10, columnspan=4, sticky=(S, E, W), padx=5, pady=5)
+
+    play_button.grid(column=0, row=0, sticky=(N, S, E, W), padx=5, pady=5)
+    controls_frame.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
+
+    contr_a.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=1)
+    contr_s.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=1)
+    contr_l.grid(column=0, row=2, sticky=(N, S, E), padx=1, pady=1)
+    contr_r.grid(column=0, row=3, sticky=(N, S, E), padx=1, pady=1)
+    descr_a.grid(column=1, row=0, sticky=(N, S, W), padx=1, pady=1)
+    descr_s.grid(column=1, row=1, sticky=(N, S, W), padx=1, pady=1)
+    descr_l.grid(column=1, row=2, sticky=(N, S, W), padx=1, pady=1)
+    descr_r.grid(column=1, row=3, sticky=(N, S, W), padx=1, pady=1)
 
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
@@ -218,6 +243,17 @@ def TOAD_GUI():
     settings.rowconfigure(5, weight=1)
     settings.rowconfigure(6, weight=1)
     settings.rowconfigure(10, weight=1)
+
+    p_c_frame.columnconfigure(0, weight=2)
+    p_c_frame.columnconfigure(0, weight=1)
+    p_c_frame.rowconfigure(0, weight=1)
+
+    controls_frame.columnconfigure(0, weight=1)
+    controls_frame.columnconfigure(1, weight=1)
+    controls_frame.rowconfigure(0, weight=1)
+    controls_frame.rowconfigure(1, weight=1)
+    controls_frame.rowconfigure(2, weight=1)
+    controls_frame.rowconfigure(3, weight=1)
 
     # Run Window
     root.mainloop()
