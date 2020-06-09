@@ -127,7 +127,7 @@ def TOAD_GUI():
         game = gateway.jvm.engine.core.MarioGame()
         game.playGame(''.join(level_obj.ascii_level), 200)
         game.getWindow().dispose()
-        gateway.shutdown()
+        gateway.java_process.kill()
         return
 
     # Make layout
