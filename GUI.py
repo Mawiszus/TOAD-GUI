@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image, ImageFont, ImageDraw
 from py4j.java_gateway import JavaGateway
 import os
 import multiprocessing as mp
@@ -32,7 +32,10 @@ def TOAD_GUI():
     ImgGen = LevelImageGen(os.path.join(os.path.join(os.curdir, "utils"), "sprites"))
     current_level, current_tokens = read_level_from_file(os.path.join(os.curdir, "levels"), "lvl_1-1.txt")
 
-    levelimage = ImageTk.PhotoImage(ImgGen.render(one_hot_to_ascii_level(current_level, current_tokens)))
+    placeholder = Image.new('RGB', (690, 256), (255, 255, 255))
+    draw = ImageDraw.Draw(placeholder)
+    draw.text((256, 128), "Level Preview will appear here.", (0, 0, 0))
+    levelimage = ImageTk.PhotoImage(placeholder)
 
     level_obj = LevelObject(one_hot_to_ascii_level(current_level, current_tokens),
                             current_level, levelimage, current_tokens)

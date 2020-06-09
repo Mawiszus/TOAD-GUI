@@ -37,3 +37,5 @@ class ScrollableImage(Canvas):
     def change_image(self, im):
         self.image = im
         self.create_image(0, 0, anchor='nw', image=self.image)
+        # Assign the region to be scrolled
+        self.config(scrollregion=self.bbox('all'))
