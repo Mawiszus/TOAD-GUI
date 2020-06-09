@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
 from PIL import ImageTk, Image
-import jnius_config
+from py4j.java_gateway import JavaGateway
 import os
 import multiprocessing as mp
 
@@ -14,8 +14,6 @@ from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_
 
 MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "../Mario-AI-Framework"))
 os.environ["MARIO_AI_PATH"] = MARIO_AI_PATH
-jnius_config.add_classpath(os.path.join(MARIO_AI_PATH, "src"))
-import jnius
 
 
 class LevelObject:
@@ -146,18 +144,12 @@ def TOAD_GUI():
         return
 
     def play_level():
-        # try:
-        print("Playing level!")
-        MarioGame = jnius.autoclass("engine.core.MarioGame")
-        game = MarioGame()
+        gateway = JavaGateway.launch_gateway(classpath=os.path.join(MARIO_AI_PATH, "src"), die_on_exit=True)
+        game = gateway.jvm.engine.core.MarioGame()
         result = game.playGame(''.join(level_obj.ascii_level), 200)
-        # System = jnius.autoclass("java.lang.System")
-        # System.exit(0)
-        game.window.dispose()
-        # except Exception:
-        #     error_msg.set("Java Mario Framework crashed. Please check your installation.")
-        # print(result.getCompletionPercentage())
+        game.getWindow().dispose()
         error_msg.set("Level Played. Completion Percentage: %d%%" % int(result.getCompletionPercentage() * 100))
+        gateway.shutdown()
         return
 
     # Make layout
