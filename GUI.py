@@ -149,7 +149,7 @@ def TOAD_GUI():
         result = game.playGame(''.join(level_obj.ascii_level), 200)
         game.getWindow().dispose()
         error_msg.set("Level Played. Completion Percentage: %d%%" % int(result.getCompletionPercentage() * 100))
-        gateway.shutdown()
+        gateway.java_process.kill()
         return
 
     # Make layout
