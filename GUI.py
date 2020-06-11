@@ -161,6 +161,7 @@ def TOAD_GUI():
         game.getWindow().dispose()
         perc = int(result.getCompletionPercentage() * 100)
         gateway.java_process.kill()
+        gateway.close()
         error_msg.set("Level Played. Completion Percentage: %d%%" % perc)
         return
 
