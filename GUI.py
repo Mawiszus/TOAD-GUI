@@ -28,6 +28,13 @@ def TOAD_GUI():
     # Init Window
     root = Tk(className=" TOAD-GUI")
 
+    # Load Icons
+    load_level_icon = ImageTk.PhotoImage(Image.open('icons/folder_level.png'))
+    load_generator_icon = ImageTk.PhotoImage(Image.open('icons/folder_toad.png'))
+    generate_level_icon = ImageTk.PhotoImage(Image.open('icons/gear_toad.png'))
+    play_level_icon = ImageTk.PhotoImage(Image.open('icons/play_button.png'))
+    save_level_icon = ImageTk.PhotoImage(Image.open('icons/save_button.png'))
+
     # Define Variables
     ImgGen = LevelImageGen(os.path.join(os.path.join(os.curdir, "utils"), "sprites"))
     current_level, current_tokens = read_level_from_file(os.path.join(os.curdir, "levels"), "lvl_1-1.txt")
@@ -161,11 +168,15 @@ def TOAD_GUI():
 
     f_label = ttk.Label(settings, text='Path:')
     fpath_label = ttk.Label(settings, textvariable=load_string_gen, width=100)
-    load_lev_button = ttk.Button(settings, text='Open Level', command=load_level)
-    load_gen_button = ttk.Button(settings, text='Open Generator', command=load_generator)
+    load_lev_button = ttk.Button(settings, compound='top', image=load_level_icon,
+                                 text='Open Level', command=load_level)
+    load_gen_button = ttk.Button(settings, compound='top', image=load_generator_icon,
+                                 text='Open Generator', command=load_generator)
 
-    gen_button = ttk.Button(settings, text='Generate level', state='disabled', command=generate)
-    save_button = ttk.Button(settings, text='Save level', state='disabled', command=save_txt)
+    gen_button = ttk.Button(settings, compound='top', image=generate_level_icon,
+                            text='Generate level', state='disabled', command=generate)
+    save_button = ttk.Button(settings, compound='top', image=save_level_icon,
+                             text='Save level', state='disabled', command=save_txt)
 
     def set_button_state(t1, t2, t3):
         if use_gen.get():
@@ -179,7 +190,8 @@ def TOAD_GUI():
     use_gen.trace("w", callback=set_button_state)
 
     p_c_frame = ttk.Frame(settings)
-    play_button = ttk.Button(p_c_frame, text='Play level', state='disabled', command=play_level)
+    play_button = ttk.Button(p_c_frame, compound='top', image=play_level_icon,
+                             text='Play level', state='disabled', command=play_level)
 
     prev_label = ttk.Label(settings, text='Preview:')
     image_label = ScrollableImage(settings, image=levelimage)
