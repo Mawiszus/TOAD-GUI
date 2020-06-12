@@ -4,7 +4,6 @@ from tkinter import filedialog as fd
 from PIL import ImageTk, Image, ImageFont, ImageDraw
 from py4j.java_gateway import JavaGateway
 import os
-import multiprocessing as mp
 
 from utils.scrollable_image import ScrollableImage
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token
@@ -13,7 +12,6 @@ from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_
 
 
 MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "Mario-AI-Framework/mario-1.0-SNAPSHOT.jar"))
-# os.environ["MARIO_AI_PATH"] = MARIO_AI_PATH
 
 
 class LevelObject:
