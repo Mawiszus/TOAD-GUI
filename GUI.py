@@ -12,8 +12,8 @@ from utils.level_image_gen import LevelImageGen
 from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_obj
 
 
-MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "../Mario-AI-Framework"))
-os.environ["MARIO_AI_PATH"] = MARIO_AI_PATH
+MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "Mario-AI-Framework/mario-1.0-SNAPSHOT.jar"))
+# os.environ["MARIO_AI_PATH"] = MARIO_AI_PATH
 
 
 class LevelObject:
@@ -155,7 +155,7 @@ def TOAD_GUI():
         return
 
     def play_level():
-        gateway = JavaGateway.launch_gateway(classpath=os.path.join(MARIO_AI_PATH, "src"), die_on_exit=True)
+        gateway = JavaGateway.launch_gateway(classpath=MARIO_AI_PATH, die_on_exit=True)
         game = gateway.jvm.engine.core.MarioGame()
         result = game.playGame(''.join(level_obj.ascii_level), 200)
         game.getWindow().dispose()
