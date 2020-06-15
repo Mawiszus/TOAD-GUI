@@ -1,7 +1,84 @@
 # TOAD-GUI
 
-TOAD-GAN Demo with GUI. Allows playing of Super Mario Levels that were generated randomly based on only one level of Super Mario Bros.
+TOAD-GUI is a Framework with which Super Mario Bros. levels can be randomly generated, loaded and saved.
+Generation is done with pre-trained TOAD-GANs (link). 
+For more information on TOAD-GAN, please refer to the paper (link) and the github (link).
 
-## Mario AI Framework
+This project uses the [Mario-AI-Framework](http://marioai.org/) by [Ahmed Khalifa](https://scholar.google.com/citations?user=DRcyg5kAAAAJ&hl=en) and includes graphics from the game _Super Mario Bros._ **It is not affiliated with or endorsed by Nintendo.
+The project was built for research purposes only.**
 
-TOAD-GUI uses the Mario AI Framework to run the levels. This requires java.
+![TOAD-GUI linux example](icons/TOAD_GUI_example.png)
+
+
+## Getting Started
+
+This section includes the necessary steps to get TOAD-GUI running on your system.
+
+### Python
+
+You will need [Python 3](https://www.python.org/downloads) and the packages specified in requirements.txt.
+We recommend setting up a [virtual environment with pip](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
+and installing the packages there.
+
+As TOAD-GAN uses **Pytorch** for its networks, we will need to install that, too.
+The Pytorch package needed can be very different depending on your system, so `pip3 install torch` will not work directly.
+Use the "Quick Start Locally" guide on [Pytorch.org](https://pytorch.org) to determine the correct package to install for your System.
+Afterwards, you can install all other requirements with:
+```
+$ pip3 install -r requirements.txt
+```
+Make sure you use the `pip3` that belongs to your previously defined virtual environment.
+
+### Java
+
+TOAD-GUI uses the [Mario-AI-Framework](http://marioai.org/) to play the generated levels.
+For the Framework to run, [Java](https://www.java.com/de/download/) needs to be installed.
+
+## Running TOAD-GUI
+
+### Startup
+
+Once all prerequisites are installed, TOAD-GUI can be started by running main.py.
+```
+$ python main.py
+```
+Depending on your system and the way you installed the prerequisites, you might need to add the path to the python(.exe) installation in your virtual environment.
+
+### TOAD-GUI
+
+When running TOAD-GUI you can:
+* ![toad folder](icons/folder_toad.png) Open a Generator (TOAD-GAN)
+* ![level folder](icons/folder_level.png) Open a (previously saved) level `.txt` to view and/or play
+* ![gear toad](icons/gear_toad.png) Generate a level (active when a generator is loaded)
+* ![save button](icons/save_button.png) Save the currently open level to a `.txt` file
+* ![play button](icons/play_button.png) Play the currently loaded level
+
+The labels at the bottom will display the currently loaded path and information.
+If the an info is not yet displayed after clicking the corresponding button, it is still running the previous command!
+Impatiently clicking the button again might crash the program. 
+
+### TOAD-GAN
+
+If you are interested in training your own Generator, refer to the TOAD-GAN github and copy the folder of your trained generator into the `generators/` folder.
+You should now be able to open it just like the provided generators.
+
+## Built With
+
+* Tkinter - Python package for building GUIs
+* py4j - Python to Java interface
+* Pillow - Python Image Library for displaying images
+* Pytorch - Deep Learning Framework
+* Maven - Used for building the Mario-AI-Framework
+
+## Authors
+
+* **Maren Awiszus** - Institut für Informationsverarbeitung, Leibniz University Hanover
+* **Frederik Schubert** - Institut für Informationsverarbeitung, Leibniz University Hanover
+
+## Copyright
+
+This program is not endorsed by Nintendo and is only intended for research purposes. 
+Mario is a Nintendo character which the authors don’t own any rights to. 
+Nintendo is also the sole owner of all the graphical assets in the game. 
+Any use of this program is expected to be on a non-commercial basis. 
+
