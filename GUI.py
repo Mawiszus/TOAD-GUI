@@ -4,6 +4,7 @@ from tkinter import filedialog as fd
 from PIL import ImageTk, Image, ImageFont, ImageDraw
 from py4j.java_gateway import JavaGateway
 import os
+import platform
 import time
 import threading
 import queue
@@ -15,6 +16,12 @@ from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_
 
 
 MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "Mario-AI-Framework/mario-1.0-SNAPSHOT.jar"))
+
+# Check if windows user to make sure taskbar icon is correct
+if platform.system() == "Windows":
+    import ctypes
+    my_appid = u'toad-gui.1.0'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(my_appid)
 
 
 class LevelObject:
