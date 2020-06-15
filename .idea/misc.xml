@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ProjectPlainTextFileTypeManager">
+    <file url="file://$PROJECT_DIR$/levels/lvl_1-1.txt" />
+    <file url="file://$PROJECT_DIR$/levels/lvl_1-2.txt" />
+    <file url="file://$PROJECT_DIR$/levels/lvl_rareblocks.txt" />
+    <file url="file://$PROJECT_DIR$/levels/lvl_test.txt" />
+    <file url="file://$PROJECT_DIR$/levels/lvl_test2.txt" />
+    <file url="file://$PROJECT_DIR$/levels/lvl_test3.txt" />
+    <file url="file://$PROJECT_DIR$/levels/lvl_test_1-2.txt" />
+    <file url="file://$PROJECT_DIR$/levels/lvl_test_1-3.txt" />
+  </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.7 (TOAD-GUI)" project-jdk-type="Python SDK" />
 </project>
