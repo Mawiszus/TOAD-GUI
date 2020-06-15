@@ -277,5 +277,8 @@ def TOAD_GUI():
     controls_frame.rowconfigure(2, weight=1)
     controls_frame.rowconfigure(3, weight=1)
 
+    # Move scrollbar to middle (to have message on the test image appear centered)
+    image_label.move_scrollbar_to_middle()
+
     # Run Window
     root.mainloop()

@@ -44,3 +44,7 @@ class ScrollableImage(Canvas):
         # Known Bug: When loading a smaller image after loading a larger one, the scrollbar will not shrink to that
         # image again.
 
+    def move_scrollbar_to_middle(self):
+        x1, x2 = self.xview()
+        self.xview_moveto(0.5 - (x2-x1)/2)
+
