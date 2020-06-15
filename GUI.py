@@ -148,13 +148,18 @@ def TOAD_GUI():
         return
 
     def save_txt():
-        save_name = fd.asksaveasfile(title='Save level', initialdir=os.path.join(os.curdir, "levels"), mode='w',
-                                     defaultextension=".txt", filetypes=[("txt files", "*.txt")])
+        save_name = fd.asksaveasfile(title='Save level (.txt/.png)', initialdir=os.path.join(os.curdir, "levels"), mode='w',
+                                     defaultextension=".txt", filetypes=[("txt files", ".txt"), ("png files", ".png")])
         if save_name is None:
             return  # saving was cancelled
-        text2save = ''.join(level_obj.ascii_level)
-        save_name.write(text2save)
-        save_name.close()
+        elif save_name.name[-3:] == "txt":
+            text2save = ''.join(level_obj.ascii_level)
+            save_name.write(text2save)
+            save_name.close()
+        elif save_name.name[-3:] == "png":
+            ImgGen.render(level_obj.ascii_level).save(save_name.name)
+        else:
+            error_msg.set("Could not save level with this extension. Supported: .txt, .png")
         return
 
     def generate():
@@ -211,7 +216,7 @@ def TOAD_GUI():
     gen_button = ttk.Button(settings, compound='top', image=generate_level_icon,
                             text='Generate level', state='disabled', command=lambda: spawn_thread(q, generate))
     save_button = ttk.Button(settings, compound='top', image=save_level_icon,
-                             text='Save level', state='disabled', command=lambda: spawn_thread(q, save_txt))
+                             text='Save Level/Image', state='disabled', command=lambda: spawn_thread(q, save_txt))
 
     def set_button_state(t1, t2, t3):
         if use_gen.get():

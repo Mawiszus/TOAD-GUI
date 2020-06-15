@@ -49,7 +49,7 @@ When running TOAD-GUI you can:
 * ![toad folder](icons/folder_toad.png) Open a Generator (TOAD-GAN)
 * ![level folder](icons/folder_level.png) Open a (previously saved) level `.txt` to view and/or play
 * ![gear toad](icons/gear_toad.png) Generate a level (active only when a generator is loaded)
-* ![save button](icons/save_button.png) Save the generated level to a `.txt` file
+* ![save button](icons/save_button.png) Save the generated level to a `.txt` or `.png` image file
 * ![play button](icons/play_button.png) Play the currently loaded level
 
 The labels at the bottom will display the currently loaded path and information.
