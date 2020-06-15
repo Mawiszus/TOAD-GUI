@@ -37,21 +37,19 @@ For the Framework to run, [Java](https://www.java.com/de/download/) needs to be 
 
 ## Running TOAD-GUI
 
-### Startup
-
 Once all prerequisites are installed, TOAD-GUI can be started by running main.py.
 ```
 $ python main.py
 ```
-Depending on your system and the way you installed the prerequisites, you might need to add the path to the python(.exe) installation in your virtual environment.
+Make sure you are using the python installation you installed the prerequisites into.
 
 ### TOAD-GUI
 
 When running TOAD-GUI you can:
 * ![toad folder](icons/folder_toad.png) Open a Generator (TOAD-GAN)
 * ![level folder](icons/folder_level.png) Open a (previously saved) level `.txt` to view and/or play
-* ![gear toad](icons/gear_toad.png) Generate a level (active when a generator is loaded)
-* ![save button](icons/save_button.png) Save the currently open level to a `.txt` file
+* ![gear toad](icons/gear_toad.png) Generate a level (active only when a generator is loaded)
+* ![save button](icons/save_button.png) Save the generated level to a `.txt` file
 * ![play button](icons/play_button.png) Play the currently loaded level
 
 The labels at the bottom will display the currently loaded path and information.

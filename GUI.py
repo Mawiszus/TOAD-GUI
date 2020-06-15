@@ -27,12 +27,15 @@ def TOAD_GUI():
     root = Tk(className=" TOAD-GUI")
 
     # Load Icons
+    toad_icon = ImageTk.PhotoImage(Image.open('icons/toad_icon.png'))
     banner_icon = ImageTk.PhotoImage(Image.open('icons/banner.png'))
     load_level_icon = ImageTk.PhotoImage(Image.open('icons/folder_level.png'))
     load_generator_icon = ImageTk.PhotoImage(Image.open('icons/folder_toad.png'))
     generate_level_icon = ImageTk.PhotoImage(Image.open('icons/gear_toad.png'))
     play_level_icon = ImageTk.PhotoImage(Image.open('icons/play_button.png'))
     save_level_icon = ImageTk.PhotoImage(Image.open('icons/save_button.png'))
+
+    root.iconphoto(False, toad_icon)
 
     # Define Variables
     ImgGen = LevelImageGen(os.path.join(os.path.join(os.curdir, "utils"), "sprites"))
