@@ -4,6 +4,9 @@ from tkinter import filedialog as fd
 from PIL import ImageTk, Image, ImageFont, ImageDraw
 from py4j.java_gateway import JavaGateway
 import os
+import time
+import threading
+import queue
 
 from utils.scrollable_image import ScrollableImage
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token
@@ -25,6 +28,26 @@ class LevelObject:
 def TOAD_GUI():
     # Init Window
     root = Tk(className=" TOAD-GUI")
+
+    # Functions to keep GUI alive when playing/loading/generating
+    class ThreadedClient(threading.Thread):
+        def __init__(self, que, fcn):
+            threading.Thread.__init__(self)
+            self.que = que
+            self.fcn = fcn
+
+        def run(self):
+            time.sleep(0.01)
+            self.que.put(self.fcn())
+
+    def spawn_thread(que, fcn):
+        thread = ThreadedClient(que, fcn)
+        thread.start()
+        periodic_call(thread)
+
+    def periodic_call(thread):
+        if thread.is_alive():
+            root.after(100, lambda: periodic_call(thread))
 
     # Load Icons
     toad_icon = ImageTk.PhotoImage(Image.open('icons/toad_icon.png'))
@@ -55,6 +78,7 @@ def TOAD_GUI():
     error_msg = StringVar()
     use_gen = BooleanVar()
     is_loaded = BooleanVar()
+    q = queue.Queue()
 
     load_string_gen.set("Click the buttons to open a level or generator.")
     load_string_txt.set(os.path.join(os.curdir, "levels"))
@@ -67,6 +91,7 @@ def TOAD_GUI():
         fname = fd.askopenfilename(title='Load Level', initialdir=os.path.join(os.curdir, 'levels'),
                                    filetypes=[("level .txt files", "*.txt")])
         try:
+            error_msg.set("Loading level...")
             if fname[-3:] == "txt":
                 load_string_gen.set('Path: ' + fname)
                 folder, lname = os.path.split(fname)
@@ -88,10 +113,11 @@ def TOAD_GUI():
 
                 use_gen.set(False)
                 is_loaded.set(True)
+                error_msg.set("Level loaded")
             else:
-                error_msg.set("Can only load .txt levels.")
+                error_msg.set("No level file selected.")
         except Exception:
-            error_msg.set("Could not load generator/level. Is the filepath correct?")
+            error_msg.set("No level file selected.")
 
         return
 
@@ -99,6 +125,7 @@ def TOAD_GUI():
         fname = fd.askdirectory(title='Load Generator Directory', initialdir=os.path.join(os.curdir, 'generators'))
 
         try:
+            error_msg.set("Loading generator...")
             load_string_gen.set('Path: ' + fname)
             folder = fname
 
@@ -116,7 +143,7 @@ def TOAD_GUI():
             is_loaded.set(False)
 
         except Exception:
-            error_msg.set("Could not load generator/level. Is the filepath correct?")
+            error_msg.set("Could not load generator. Is the filepath correct?")
 
         return
 
@@ -134,7 +161,7 @@ def TOAD_GUI():
         if toadgan_obj.Gs is None:
             error_msg.set("Generator did not load correctly. Are all necessary files in the folder?")
         else:
-            print("Level generated!")
+            error_msg.set("Generating level...")
             level = generate_sample(toadgan_obj.Gs, toadgan_obj.Zs, toadgan_obj.reals, toadgan_obj.NoiseAmp,
                                     toadgan_obj.num_layers, toadgan_obj.token_list).cpu()
             level_obj.oh_level = level
@@ -152,10 +179,12 @@ def TOAD_GUI():
             level_obj.image = img
 
             is_loaded.set(True)
-            error_msg.set("Level Generated")
+            print("Level generated!")
+            error_msg.set("Level generated!")
         return
 
     def play_level():
+        error_msg.set("Playing level...")
         gateway = JavaGateway.launch_gateway(classpath=MARIO_AI_PATH, die_on_exit=True)
         game = gateway.jvm.engine.core.MarioGame()
         result = game.playGame(''.join(level_obj.ascii_level), 200)
@@ -175,14 +204,14 @@ def TOAD_GUI():
 
     fpath_label = ttk.Label(settings, textvariable=load_string_gen, width=100)
     load_lev_button = ttk.Button(settings, compound='top', image=load_level_icon, width=35,
-                                 text='Open Level', command=load_level)
+                                 text='Open Level', command=lambda: spawn_thread(q, load_level))
     load_gen_button = ttk.Button(settings, compound='top', image=load_generator_icon, width=35,
-                                 text='Open Generator', command=load_generator)
+                                 text='Open Generator', command=lambda: spawn_thread(q, load_generator))
 
     gen_button = ttk.Button(settings, compound='top', image=generate_level_icon,
-                            text='Generate level', state='disabled', command=generate)
+                            text='Generate level', state='disabled', command=lambda: spawn_thread(q, generate))
     save_button = ttk.Button(settings, compound='top', image=save_level_icon,
-                             text='Save level', state='disabled', command=save_txt)
+                             text='Save level', state='disabled', command=lambda: spawn_thread(q, save_txt))
 
     def set_button_state(t1, t2, t3):
         if use_gen.get():
@@ -197,7 +226,7 @@ def TOAD_GUI():
 
     p_c_frame = ttk.Frame(settings)
     play_button = ttk.Button(p_c_frame, compound='top', image=play_level_icon,
-                             text='Play level', state='disabled', command=play_level)
+                             text='Play level', state='disabled', command=lambda: spawn_thread(q, play_level))
 
     prev_label = ttk.Label(settings, text='Preview:')
     image_label = ScrollableImage(settings, image=levelimage, height=271)
