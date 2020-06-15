@@ -4,7 +4,9 @@ TOAD-GUI is a Framework with which Super Mario Bros. levels can be randomly gene
 Generation is done with pre-trained [TOAD-GAN](https://tntgit:3000/awiszus/TOAD-GAN). 
 For more information on TOAD-GAN, please refer to the paper (link to be added) and the [github](https://tntgit:3000/awiszus/TOAD-GAN).
 
+<br/>
 <img align="center" alt="TOAD-GUI linux example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD_GUI_example.png">
+<br/><br/>
 
 This project uses the [Mario-AI-Framework](http://marioai.org/) by [Ahmed Khalifa](https://scholar.google.com/citations?user=DRcyg5kAAAAJ&hl=en) and includes graphics from the game _Super Mario Bros._ **It is not affiliated with or endorsed by Nintendo.
 The project was built for research purposes only.**
