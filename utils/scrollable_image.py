@@ -40,6 +40,7 @@ class ScrollableImage(Canvas):
         self.create_image(0, 0, anchor='nw', image=self.image)
         # Assign the region to be scrolled
         self.config(scrollregion=self.bbox('all'))
+        self.xview_moveto(0)
 
         # Known Bug: When loading a smaller image after loading a larger one, the scrollbar will not shrink to that
         # image again.
