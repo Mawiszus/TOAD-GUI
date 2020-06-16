@@ -75,7 +75,7 @@ class LevelImageGen:
             new_left = new_left - 16
             new_top = new_top - (curr_y-1)*16
 
-        elif sprite_key in ['y', 'E', 'g', 'k', 'r', '*']:  # enemy sprite
+        elif sprite_key in ['y', 'E', 'g', 'k', 'r']:  # enemy sprite
             actual_sprite = self.sprite_dict[sprite_key]
             new_top = new_top-16
 
@@ -124,6 +124,18 @@ class LevelImageGen:
                     actual_sprite = self.sprite_dict[sprite_key]
             else:
                 actual_sprite = self.sprite_dict[sprite_key]
+
+        elif sprite_key == '*':  # alternative bullet bill tower
+            if curr_y > 0:
+                if ascii_level[curr_y-1][curr_x] != sprite_key:  # top
+                    actual_sprite = self.sprite_dict['B']
+                elif curr_y > 1:
+                    if ascii_level[curr_y-2][curr_x] != sprite_key:
+                        actual_sprite = self.sprite_dict['b']
+                    else:
+                        actual_sprite = self.sprite_dict['b2']
+            else:
+                actual_sprite = self.sprite_dict['b2']
 
         elif sprite_key in ['T', 't']:  # Pipes
 

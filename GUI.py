@@ -17,7 +17,7 @@ from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_
 
 MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "Mario-AI-Framework/mario-1.0-SNAPSHOT.jar"))
 
-# Check if windows user to make sure taskbar icon is correct
+# Cheasck if windows user to make sure taskbar icon is correct
 if platform.system() == "Windows":
     import ctypes
     my_appid = u'toad-gui.1.0'
@@ -69,7 +69,7 @@ def TOAD_GUI():
 
     # Define Variables
     ImgGen = LevelImageGen(os.path.join(os.path.join(os.curdir, "utils"), "sprites"))
-    current_level, current_tokens = read_level_from_file(os.path.join(os.curdir, "levels"), "lvl_1-1.txt")
+    current_level, current_tokens = read_level_from_file(os.path.join(os.curdir, "levels/originals"), "lvl_1-1.txt")
 
     placeholder = Image.new('RGB', (690, 256), (255, 255, 255))
     draw = ImageDraw.Draw(placeholder)
