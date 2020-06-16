@@ -99,6 +99,8 @@ def TOAD_GUI():
                                    filetypes=[("level .txt files", "*.txt")])
         try:
             error_msg.set("Loading level...")
+            is_loaded.set(False)
+            use_gen.set(False)
             if fname[-3:] == "txt":
                 load_string_gen.set('Path: ' + fname)
                 folder, lname = os.path.split(fname)
@@ -133,6 +135,8 @@ def TOAD_GUI():
 
         try:
             error_msg.set("Loading generator...")
+            use_gen.set(False)
+            is_loaded.set(False)
             load_string_gen.set('Path: ' + fname)
             folder = fname
 
@@ -174,6 +178,7 @@ def TOAD_GUI():
             error_msg.set("Generator did not load correctly. Are all necessary files in the folder?")
         else:
             error_msg.set("Generating level...")
+            is_loaded.set(False)
             level = generate_sample(toadgan_obj.Gs, toadgan_obj.Zs, toadgan_obj.reals, toadgan_obj.NoiseAmp,
                                     toadgan_obj.num_layers, toadgan_obj.token_list).cpu()
             level_obj.oh_level = level
@@ -197,6 +202,8 @@ def TOAD_GUI():
 
     def play_level():
         error_msg.set("Playing level...")
+        use_gen.set(False)
+        is_loaded.set(False)
         gateway = JavaGateway.launch_gateway(classpath=MARIO_AI_PATH, die_on_exit=True)
         game = gateway.jvm.engine.core.MarioGame()
         result = game.playGame(''.join(level_obj.ascii_level), 200)
@@ -205,6 +212,8 @@ def TOAD_GUI():
         gateway.java_process.kill()
         gateway.close()
         error_msg.set("Level Played. Completion Percentage: %d%%" % perc)
+        use_gen.set(True)
+        is_loaded.set(True)
         return
 
     # Make layout
