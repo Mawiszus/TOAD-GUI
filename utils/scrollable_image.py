@@ -1,6 +1,7 @@
 # source https://stackoverflow.com/questions/56043767/show-large-image-using-scrollbar-in-python/56043976
 from tkinter import *
 from tkinter import ttk
+import platform
 
 
 class ScrollableImage(Canvas):
@@ -25,15 +26,29 @@ class ScrollableImage(Canvas):
         self.config(scrollregion=self.bbox('all'))
 
         self.focus_set()
-        self.bind_class(self, "<MouseWheel>", self.mouse_scroll)
+        if platform.system() == 'Linux':
+            self.bind_class(self, "<Button-4>", self.mouse_scroll)
+            self.bind_class(self, "<Button-5>", self.mouse_scroll)
+        else:
+            self.bind_class(self, "<MouseWheel>", self.mouse_scroll)
 
     def mouse_scroll(self, evt):
         if evt.state == 0:
-            # self.yview_scroll(-1*(evt.delta), 'units') # For MacOS
-            self.xview_scroll(int(-1*(evt.delta/120)), 'units')  # For windows
+            if platform.system() == 'Windows':
+                self.xview_scroll(int(-1*(evt.delta/120)), 'units')  # For windows
+            elif platform.system() == 'Linux':
+                delta = 1 if evt.num == 4 else -1
+                self.xview_scroll(-1 * delta, 'units')  # For Linux
+            else:
+                self.xview_scroll(-1*evt.delta, 'units')  # For MacOS
         if evt.state == 1:
-            # self.xview_scroll(-1*(evt.delta), 'units') # For MacOS
-            self.yview_scroll(int(-1*(evt.delta/120)), 'units')  # For windows
+            if platform.system() == 'Windows':
+                self.yview_scroll(int(-1*(evt.delta/120)), 'units')  # For windows
+            elif platform.system() == 'Linux':
+                delta = 1 if evt.num == 4 else -1
+                self.xview_scroll(-1 * delta, 'units')  # For Linux
+            else:
+                self.yview_scroll(-1*evt.delta, 'units')  # For MacOS
 
     def change_image(self, im):
         self.image = im
