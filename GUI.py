@@ -159,8 +159,9 @@ def TOAD_GUI():
         return
 
     def save_txt():
-        save_name = fd.asksaveasfile(title='Save level (.txt/.png)', initialdir=os.path.join(os.curdir, "levels"), mode='w',
-                                     defaultextension=".txt", filetypes=[("txt files", ".txt"), ("png files", ".png")])
+        save_name = fd.asksaveasfile(title='Save level (.txt/.png)', initialdir=os.path.join(os.curdir, "levels"),
+                                     mode='w', defaultextension=".txt",
+                                     filetypes=[("txt files", ".txt"), ("png files", ".png")])
         if save_name is None:
             return  # saving was cancelled
         elif save_name.name[-3:] == "txt":
@@ -289,8 +290,8 @@ def TOAD_GUI():
     prev_label.grid(column=0, row=5, columnspan=4, sticky=(S, W), padx=5, pady=5)
     image_label.grid(column=0, row=6, columnspan=4, sticky=(N, E, W), padx=5, pady=5)
     p_c_frame.grid(column=1, row=7, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
-    fpath_label.grid(column=0, row=9, columnspan=4, sticky=(S, E, W), padx=5, pady=10)
-    error_label.grid(column=0, row=10, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
+    fpath_label.grid(column=0, row=99, columnspan=4, sticky=(S, E, W), padx=5, pady=10)
+    error_label.grid(column=0, row=100, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
 
     play_button.grid(column=0, row=0, sticky=(N, S, E, W), padx=5, pady=5)
     controls_frame.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
@@ -332,6 +333,86 @@ def TOAD_GUI():
 
     # Move scrollbar to middle (to have message on the test image appear centered)
     root.after(1, image_label.move_scrollbar_to_middle)
+
+    # -------------------- Handling Editmode -----------------------------
+
+    # Variables
+    editmode = BooleanVar()
+    bbox_x1 = IntVar()
+    bbox_x2 = IntVar()
+    bbox_y1 = IntVar()
+    bbox_y2 = IntVar()
+    temp = DoubleVar()
+
+    editmode.set(False)
+    bbox_x1.set(0)
+    bbox_x2.set(None)
+    bbox_y1.set(0)
+    bbox_y2.set(None)
+    temp.set(6)
+
+    # Widgets
+    emode_box = ttk.Checkbutton(settings, text="Edit mode", variable=editmode)
+    emode_box.grid(column=1, row=8, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
+
+    emode_frame = ttk.LabelFrame(settings, text="Edit mode controls", padding=(5, 5, 5, 5))
+    bbox_frame = ttk.LabelFrame(emode_frame, text="Bounding Box", relief="groove", padding=(5, 5, 5, 5))
+    x1_label = ttk.Label(bbox_frame, text="x1:")
+    x1_entry = ttk.Entry(bbox_frame, textvariable=bbox_x1)
+    x2_label = ttk.Label(bbox_frame, text="x2:")
+    x2_entry = ttk.Entry(bbox_frame, textvariable=bbox_x2)
+    y1_label = ttk.Label(bbox_frame, text=" y1:")
+    y1_entry = ttk.Entry(bbox_frame, textvariable=bbox_y1)
+    y2_label = ttk.Label(bbox_frame, text=" y2:")
+    y2_entry = ttk.Entry(bbox_frame, textvariable=bbox_y2)
+    t_label = ttk.Label(emode_frame, text="Temperature:")
+    t_entry = ttk.Entry(emode_frame, textvariable=temp)
+
+    def toggle_editmode(t1, t2, t3):
+        if editmode.get():
+            # Grid all the things
+            emode_frame.grid(column=1, row=9, columnspan=2, sticky=(N, S, E, W))
+            bbox_frame.grid(column=0, row=0, columnspan=2, sticky=(N, S))
+            x1_label.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=1)
+            x1_entry.grid(column=1, row=0, sticky=(N, S, W), padx=5, pady=1)
+            x2_label.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=1)
+            x2_entry.grid(column=1, row=1, sticky=(N, S, W), padx=5, pady=1)
+            y1_label.grid(column=2, row=0, sticky=(N, S, E), padx=1, pady=1)
+            y1_entry.grid(column=3, row=0, sticky=(N, S, W), padx=5, pady=1)
+            y2_label.grid(column=2, row=1, sticky=(N, S, E), padx=1, pady=1)
+            y2_entry.grid(column=3, row=1, sticky=(N, S, W), padx=5, pady=1)
+            t_label.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=5)
+            t_entry.grid(column=1, row=1, sticky=(N, S, W), padx=1, pady=5)
+
+            emode_frame.columnconfigure(0, weight=1)
+            emode_frame.columnconfigure(1, weight=1)
+            emode_frame.rowconfigure(0, weight=1)
+            emode_frame.rowconfigure(1, weight=1)
+
+            bbox_frame.columnconfigure(0, weight=1)
+            bbox_frame.columnconfigure(1, weight=1)
+            bbox_frame.columnconfigure(2, weight=1)
+            bbox_frame.columnconfigure(3, weight=1)
+            bbox_frame.rowconfigure(0, weight=1)
+            bbox_frame.rowconfigure(1, weight=1)
+            print("toggle on")
+        else:
+            # Hide all the things
+            emode_frame.grid_forget()
+            bbox_frame.grid_forget()
+            x1_label.grid_forget()
+            x1_entry.grid_forget()
+            x2_label.grid_forget()
+            x2_entry.grid_forget()
+            y1_label.grid_forget()
+            y1_entry.grid_forget()
+            y2_label.grid_forget()
+            y2_entry.grid_forget()
+            t_label.grid_forget()
+            t_entry.grid_forget()
+            print("toggle off")
+
+    editmode.trace("w", callback=toggle_editmode)
 
     # Run Window
     root.mainloop()
