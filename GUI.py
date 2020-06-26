@@ -8,11 +8,13 @@ import platform
 import time
 import threading
 import queue
+import torch
 
 from utils.scrollable_image import ScrollableImage
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token
 from utils.level_image_gen import LevelImageGen
 from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_obj
+from utils.sampling_tools import get_samples
 
 
 MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "Mario-AI-Framework/mario-1.0-SNAPSHOT.jar"))
@@ -107,7 +109,7 @@ def TOAD_GUI():
 
                 lev, tok = read_level_from_file(folder, lname)
 
-                level_obj.oh_level = lev
+                level_obj.oh_level = torch.Tensor(lev)  # casting to Tensor to keep consistency
                 level_obj.ascii_level = one_hot_to_ascii_level(lev, tok)
                 m_exists = False
                 for line in level_obj.ascii_level:
@@ -183,23 +185,41 @@ def TOAD_GUI():
             level = generate_sample(toadgan_obj.Gs, toadgan_obj.Zs, toadgan_obj.reals, toadgan_obj.NoiseAmp,
                                     toadgan_obj.num_layers, toadgan_obj.token_list).cpu()
             level_obj.oh_level = level
+
             level_obj.ascii_level = one_hot_to_ascii_level(level, toadgan_obj.token_list)
-            m_exists = False
-            for line in level_obj.ascii_level:
-                if 'M' in line:
-                    m_exists = True
-            if not m_exists:
-                level_obj.ascii_level = place_a_mario_token(level_obj.ascii_level)
-            level_obj.tokens = toadgan_obj.token_list
-
-            img = ImageTk.PhotoImage(ImgGen.render(level_obj.ascii_level))
-
-            level_obj.image = img
+            redraw_image()
 
             is_loaded.set(True)
             print("Level generated!")
             error_msg.set("Level generated!")
         return
+
+    def redraw_image(edit_mode=False, rectangle=[(0, 0), (16, 16)]):
+        m_exists = False
+        for line in level_obj.ascii_level:
+            if 'M' in line:
+                m_exists = True
+        if not m_exists:
+            level_obj.ascii_level = place_a_mario_token(level_obj.ascii_level)
+        level_obj.tokens = toadgan_obj.token_list
+
+        pil_img = ImgGen.render(level_obj.ascii_level)
+
+        if edit_mode:
+            # Add Visualizations for rows and bounding box
+            l_draw = ImageDraw.Draw(pil_img)
+            for y in range(level_obj.oh_level.shape[-2]):
+                l_draw.multiline_text((1, 4+y*16), str(y), (255, 255, 255),
+                                      stroke_width=-1, stroke_fill=(0, 0, 0))
+            for x in range(level_obj.oh_level.shape[-1]):
+                l_draw.multiline_text((6+x*16, 0), "".join(["%s\n" % c for c in str(x)]), (255, 255, 255),
+                                      stroke_width=-1, stroke_fill=(0, 0, 0), direction='ttb', spacing=0, align='right')
+            l_draw.rectangle(rectangle, outline=(255, 0, 0), width=2)
+
+        img = ImageTk.PhotoImage(pil_img)
+
+        level_obj.image = img
+        image_label.change_image(level_obj.image)
 
     def play_level():
         error_msg.set("Playing level...")
@@ -346,9 +366,9 @@ def TOAD_GUI():
 
     editmode.set(False)
     bbox_x1.set(0)
-    bbox_x2.set(None)
+    bbox_x2.set(16)
     bbox_y1.set(0)
-    bbox_y2.set(None)
+    bbox_y2.set(16)
     temp.set(6)
 
     # Widgets
@@ -357,16 +377,48 @@ def TOAD_GUI():
 
     emode_frame = ttk.LabelFrame(settings, text="Edit mode controls", padding=(5, 5, 5, 5))
     bbox_frame = ttk.LabelFrame(emode_frame, text="Bounding Box", relief="groove", padding=(5, 5, 5, 5))
+
+    def on_validate(inStr, act_type):
+        if act_type == '1':  # insertion
+            if not inStr.isdigit():
+                return False
+        return True
+
     x1_label = ttk.Label(bbox_frame, text="x1:")
-    x1_entry = ttk.Entry(bbox_frame, textvariable=bbox_x1)
+    x1_entry = ttk.Entry(bbox_frame, textvariable=bbox_x1, validate="key")
     x2_label = ttk.Label(bbox_frame, text="x2:")
-    x2_entry = ttk.Entry(bbox_frame, textvariable=bbox_x2)
+    x2_entry = ttk.Entry(bbox_frame, textvariable=bbox_x2, validate="key")
     y1_label = ttk.Label(bbox_frame, text=" y1:")
-    y1_entry = ttk.Entry(bbox_frame, textvariable=bbox_y1)
+    y1_entry = ttk.Entry(bbox_frame, textvariable=bbox_y1, validate="key")
     y2_label = ttk.Label(bbox_frame, text=" y2:")
-    y2_entry = ttk.Entry(bbox_frame, textvariable=bbox_y2)
+    y2_entry = ttk.Entry(bbox_frame, textvariable=bbox_y2, validate="key")
     t_label = ttk.Label(emode_frame, text="Temperature:")
-    t_entry = ttk.Entry(emode_frame, textvariable=temp)
+    t_entry = ttk.Entry(emode_frame, textvariable=temp, validate="key")
+
+    vcmd_x1 = (x1_entry.register(on_validate), '%P', '%d')
+    vcmd_x2 = (x2_entry.register(on_validate), '%P', '%d')
+    vcmd_y1 = (y1_entry.register(on_validate), '%P', '%d')
+    vcmd_y2 = (y2_entry.register(on_validate), '%P', '%d')
+    vcmd_t = (t_entry.register(on_validate), '%P', '%d')
+
+    x1_entry.configure(validatecommand=vcmd_x1)
+    x2_entry.configure(validatecommand=vcmd_x2)
+    y1_entry.configure(validatecommand=vcmd_y1)
+    y2_entry.configure(validatecommand=vcmd_y2)
+    t_entry.configure(validatecommand=vcmd_t)
+
+    resample_button = ttk.Button(emode_frame, text="Resample", command=lambda: spawn_thread(q, re_sample))
+
+    def re_sample():
+        is_loaded.set(False)
+        bbox = (bbox_x1.get(), bbox_x2.get(), bbox_y1.get(), bbox_y2.get())
+        samples = get_samples(1, level_obj.oh_level, bbox, temp.get())
+        tmp_lvl = level_obj.oh_level.clone()
+        tmp_lvl[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]] = samples[0]
+        level_obj.ascii_level = one_hot_to_ascii_level(tmp_lvl, toadgan_obj.token_list)
+        redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
+
+        is_loaded.set(True)
 
     def toggle_editmode(t1, t2, t3):
         if editmode.get():
@@ -383,9 +435,11 @@ def TOAD_GUI():
             y2_entry.grid(column=3, row=1, sticky=(N, S, W), padx=5, pady=1)
             t_label.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=5)
             t_entry.grid(column=1, row=1, sticky=(N, S, W), padx=1, pady=5)
+            resample_button.grid(column=2, row=0, rowspan=2, sticky=(N, S, E, W), padx=5, pady=1)
 
             emode_frame.columnconfigure(0, weight=1)
             emode_frame.columnconfigure(1, weight=1)
+            emode_frame.columnconfigure(2, weight=1)
             emode_frame.rowconfigure(0, weight=1)
             emode_frame.rowconfigure(1, weight=1)
 
@@ -395,7 +449,7 @@ def TOAD_GUI():
             bbox_frame.columnconfigure(3, weight=1)
             bbox_frame.rowconfigure(0, weight=1)
             bbox_frame.rowconfigure(1, weight=1)
-            print("toggle on")
+            redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
         else:
             # Hide all the things
             emode_frame.grid_forget()
@@ -410,7 +464,8 @@ def TOAD_GUI():
             y2_entry.grid_forget()
             t_label.grid_forget()
             t_entry.grid_forget()
-            print("toggle off")
+            resample_button.grid_forget()
+            redraw_image(False)
 
     editmode.trace("w", callback=toggle_editmode)
 
