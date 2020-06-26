@@ -11,7 +11,7 @@ import queue
 import torch
 
 from utils.scrollable_image import ScrollableImage
-from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token
+from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token, ascii_to_one_hot_level
 from utils.level_image_gen import LevelImageGen
 from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_obj
 from utils.sampling_tools import get_samples
@@ -282,6 +282,7 @@ def TOAD_GUI():
             image_label.change_image(level_obj.image)
         else:
             play_button.state(['disabled'])
+        toggle_editmode(t1, t2, t3)
         return
 
     is_loaded.trace("w", callback=set_play_state)
@@ -337,8 +338,9 @@ def TOAD_GUI():
     settings.rowconfigure(3, weight=1)
     settings.rowconfigure(4, weight=1)
     settings.rowconfigure(5, weight=1)
-    settings.rowconfigure(6, weight=1)
-    settings.rowconfigure(10, weight=1)
+    settings.rowconfigure(6, weight=2)
+    settings.rowconfigure(99, weight=1)
+    settings.rowconfigure(100, weight=1)
 
     p_c_frame.columnconfigure(0, weight=2)
     p_c_frame.columnconfigure(0, weight=1)
@@ -374,6 +376,7 @@ def TOAD_GUI():
     # Widgets
     emode_box = ttk.Checkbutton(settings, text="Edit mode", variable=editmode)
     emode_box.grid(column=1, row=8, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
+    settings.rowconfigure(8, weight=1)
 
     emode_frame = ttk.LabelFrame(settings, text="Edit mode controls", padding=(5, 5, 5, 5))
     bbox_frame = ttk.LabelFrame(emode_frame, text="Bounding Box", relief="groove", padding=(5, 5, 5, 5))
@@ -385,13 +388,13 @@ def TOAD_GUI():
         return True
 
     x1_label = ttk.Label(bbox_frame, text="x1:")
-    x1_entry = ttk.Entry(bbox_frame, textvariable=bbox_x1, validate="key")
+    x1_entry = ttk.Entry(bbox_frame, textvariable=bbox_y1, validate="key")
     x2_label = ttk.Label(bbox_frame, text="x2:")
-    x2_entry = ttk.Entry(bbox_frame, textvariable=bbox_x2, validate="key")
+    x2_entry = ttk.Entry(bbox_frame, textvariable=bbox_y2, validate="key")
     y1_label = ttk.Label(bbox_frame, text=" y1:")
-    y1_entry = ttk.Entry(bbox_frame, textvariable=bbox_y1, validate="key")
+    y1_entry = ttk.Entry(bbox_frame, textvariable=bbox_x1, validate="key")
     y2_label = ttk.Label(bbox_frame, text=" y2:")
-    y2_entry = ttk.Entry(bbox_frame, textvariable=bbox_y2, validate="key")
+    y2_entry = ttk.Entry(bbox_frame, textvariable=bbox_x2, validate="key")
     t_label = ttk.Label(emode_frame, text="Temperature:")
     t_entry = ttk.Entry(emode_frame, textvariable=temp, validate="key")
 
@@ -408,6 +411,7 @@ def TOAD_GUI():
     t_entry.configure(validatecommand=vcmd_t)
 
     resample_button = ttk.Button(emode_frame, text="Resample", command=lambda: spawn_thread(q, re_sample))
+    confirm_sample_button = ttk.Button(emode_frame, text="Confirm", command=lambda: spawn_thread(q, confirm_sample))
 
     def re_sample():
         is_loaded.set(False)
@@ -419,6 +423,12 @@ def TOAD_GUI():
         redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
 
         is_loaded.set(True)
+
+    def confirm_sample():
+        bbox = (bbox_x1.get(), bbox_x2.get(), bbox_y1.get(), bbox_y2.get())
+        level_obj.oh_level[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]] = \
+            ascii_to_one_hot_level(level_obj.ascii_level,
+                                   toadgan_obj.token_list)[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]]
 
     def toggle_editmode(t1, t2, t3):
         if editmode.get():
@@ -436,10 +446,12 @@ def TOAD_GUI():
             t_label.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=5)
             t_entry.grid(column=1, row=1, sticky=(N, S, W), padx=1, pady=5)
             resample_button.grid(column=2, row=0, rowspan=2, sticky=(N, S, E, W), padx=5, pady=1)
+            confirm_sample_button.grid(column=3, row=0, rowspan=2, sticky=(N, S, E, W), padx=5, pady=1)
 
             emode_frame.columnconfigure(0, weight=1)
             emode_frame.columnconfigure(1, weight=1)
             emode_frame.columnconfigure(2, weight=1)
+            emode_frame.columnconfigure(3, weight=1)
             emode_frame.rowconfigure(0, weight=1)
             emode_frame.rowconfigure(1, weight=1)
 
@@ -450,6 +462,7 @@ def TOAD_GUI():
             bbox_frame.rowconfigure(0, weight=1)
             bbox_frame.rowconfigure(1, weight=1)
             redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
+
         else:
             # Hide all the things
             emode_frame.grid_forget()
