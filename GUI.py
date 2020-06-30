@@ -194,7 +194,7 @@ def TOAD_GUI():
             error_msg.set("Level generated!")
         return
 
-    def redraw_image(edit_mode=False, rectangle=[(0, 0), (16, 16)]):
+    def redraw_image(edit_mode=False, rectangle=[(0, 0), (16, 16)], stat_mode=False, seed=(8*16, 8*16)):
         m_exists = False
         for line in level_obj.ascii_level:
             if 'M' in line:
@@ -215,6 +215,10 @@ def TOAD_GUI():
                 l_draw.multiline_text((6+x*16, 0), "".join(["%s\n" % c for c in str(x)]), (255, 255, 255),
                                       stroke_width=-1, stroke_fill=(0, 0, 0), direction='ttb', spacing=0, align='right')
             l_draw.rectangle(rectangle, outline=(255, 0, 0), width=2)
+            if stat_mode:
+                ellipse = [(rectangle[0][0] + seed[0], rectangle[0][1] + seed[1]),
+                           (rectangle[0][0] + seed[0] + 16, rectangle[0][1] + seed[1] + 16)]
+                l_draw.ellipse(ellipse, outline=(0, 255, 0), width=2)
 
         img = ImageTk.PhotoImage(pil_img)
 
@@ -365,6 +369,10 @@ def TOAD_GUI():
     bbox_y1 = IntVar()
     bbox_y2 = IntVar()
     temp = DoubleVar()
+    edit_type = StringVar()
+    seed_x = IntVar()
+    seed_y = IntVar()
+    seed_token = IntVar()
 
     editmode.set(False)
     bbox_x1.set(0)
@@ -372,6 +380,10 @@ def TOAD_GUI():
     bbox_y1.set(0)
     bbox_y2.set(16)
     temp.set(6)
+    edit_type.set("tokenwise")
+    seed_x.set(8)
+    seed_y.set(8)
+    seed_token.set(0)
 
     # Widgets
     emode_box = ttk.Checkbutton(settings, text="Edit mode", variable=editmode)
@@ -379,6 +391,10 @@ def TOAD_GUI():
     settings.rowconfigure(8, weight=1)
 
     emode_frame = ttk.LabelFrame(settings, text="Edit mode controls", padding=(5, 5, 5, 5))
+    type_switch_frame = ttk.Frame(emode_frame, padding=(0, 5, 0, 5))
+    type_switch_label = ttk.Label(type_switch_frame, text="Edit Type:")
+    type_switch_0 = ttk.Radiobutton(type_switch_frame, text="Tokenwise", variable=edit_type, value="tokenwise")
+    type_switch_1 = ttk.Radiobutton(type_switch_frame, text="Statistics enhanced", variable=edit_type, value="stats")
     bbox_frame = ttk.LabelFrame(emode_frame, text="Bounding Box", relief="groove", padding=(5, 5, 5, 5))
 
     def on_validate(inStr, act_type):
@@ -397,32 +413,59 @@ def TOAD_GUI():
     y2_entry = ttk.Entry(bbox_frame, textvariable=bbox_x2, validate="key")
     t_label = ttk.Label(emode_frame, text="Temperature:")
     t_entry = ttk.Entry(emode_frame, textvariable=temp, validate="key")
+    sx_label = ttk.Label(emode_frame, text="Seed x:")
+    sx_entry = ttk.Entry(emode_frame, textvariable=seed_x, validate="key")
+    sy_label = ttk.Label(emode_frame, text="Seed y:")
+    sy_entry = ttk.Entry(emode_frame, textvariable=seed_y, validate="key")
+    st_label = ttk.Label(emode_frame, text="Seed token:")
+    st_entry = ttk.Entry(emode_frame, textvariable=seed_token, validate="key")
 
     vcmd_x1 = (x1_entry.register(on_validate), '%P', '%d')
     vcmd_x2 = (x2_entry.register(on_validate), '%P', '%d')
     vcmd_y1 = (y1_entry.register(on_validate), '%P', '%d')
     vcmd_y2 = (y2_entry.register(on_validate), '%P', '%d')
     vcmd_t = (t_entry.register(on_validate), '%P', '%d')
+    vcmd_sx = (sx_entry.register(on_validate), '%P', '%d')
+    vcmd_sy = (sy_entry.register(on_validate), '%P', '%d')
+    vcmd_st = (st_entry.register(on_validate), '%P', '%d')
 
     x1_entry.configure(validatecommand=vcmd_x1)
     x2_entry.configure(validatecommand=vcmd_x2)
     y1_entry.configure(validatecommand=vcmd_y1)
     y2_entry.configure(validatecommand=vcmd_y2)
     t_entry.configure(validatecommand=vcmd_t)
+    sx_entry.configure(validatecommand=vcmd_sx)
+    sy_entry.configure(validatecommand=vcmd_sy)
+    st_entry.configure(validatecommand=vcmd_st)
 
     resample_button = ttk.Button(emode_frame, text="Resample", command=lambda: spawn_thread(q, re_sample))
     confirm_sample_button = ttk.Button(emode_frame, text="Confirm", command=lambda: spawn_thread(q, confirm_sample))
 
     def re_sample():
-        is_loaded.set(False)
-        bbox = (bbox_x1.get(), bbox_x2.get(), bbox_y1.get(), bbox_y2.get())
-        samples = get_samples(1, level_obj.oh_level, bbox, temp.get())
-        tmp_lvl = level_obj.oh_level.clone()
-        tmp_lvl[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]] = samples[0]
-        level_obj.ascii_level = one_hot_to_ascii_level(tmp_lvl, toadgan_obj.token_list)
-        redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
+        if edit_type.get() == "tokenwise":
+            is_loaded.set(False)
+            bbox = (bbox_x1.get(), bbox_x2.get(), bbox_y1.get(), bbox_y2.get())
+            samples = get_samples(1, level_obj.oh_level, bbox, temp.get())
+            tmp_lvl = level_obj.oh_level.clone()
+            tmp_lvl[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]] = samples[0]
+            level_obj.ascii_level = one_hot_to_ascii_level(tmp_lvl, toadgan_obj.token_list)
+            redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
 
-        is_loaded.set(True)
+            is_loaded.set(True)
+        elif edit_type.get() == "stats":
+            is_loaded.set(False)
+            bbox = (bbox_x1.get(), bbox_x2.get(), bbox_y1.get(), bbox_y2.get())
+            samples = get_samples(1, level_obj.oh_level, bbox, temp.get(),
+                                  use_stats=True, stat_seed=(seed_y.get(), seed_x.get()),
+                                  stat_tok_ind=seed_token.get(), curr_token_list=toadgan_obj.token_list)
+            tmp_lvl = level_obj.oh_level.clone()
+            tmp_lvl[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]] = samples[0]
+            level_obj.ascii_level = one_hot_to_ascii_level(tmp_lvl, toadgan_obj.token_list)
+            redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)],
+                         stat_mode=True, seed=(seed_y.get()*16, seed_x.get()*16))
+            is_loaded.set(True)
+        else:
+            error_msg.set("Unknown resample mode. Check Radiobuttons.")
 
     def confirm_sample():
         bbox = (bbox_x1.get(), bbox_x2.get(), bbox_y1.get(), bbox_y2.get())
@@ -434,7 +477,11 @@ def TOAD_GUI():
         if editmode.get():
             # Grid all the things
             emode_frame.grid(column=1, row=9, columnspan=2, sticky=(N, S, E, W))
-            bbox_frame.grid(column=0, row=0, columnspan=2, sticky=(N, S))
+            type_switch_frame.grid(column=0, row=0, columnspan=4, sticky=(N, S, E, W))
+            type_switch_label.grid(column=0, row=0, sticky=(N, S, E), padx=5)
+            type_switch_0.grid(column=1, row=0, sticky=(N, S, E, W), padx=5)
+            type_switch_1.grid(column=2, row=0, sticky=(N, S, E, W), padx=5)
+            bbox_frame.grid(column=0, row=1, columnspan=4, sticky=(N, S))
             x1_label.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=1)
             x1_entry.grid(column=1, row=0, sticky=(N, S, W), padx=5, pady=1)
             x2_label.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=1)
@@ -443,17 +490,33 @@ def TOAD_GUI():
             y1_entry.grid(column=3, row=0, sticky=(N, S, W), padx=5, pady=1)
             y2_label.grid(column=2, row=1, sticky=(N, S, E), padx=1, pady=1)
             y2_entry.grid(column=3, row=1, sticky=(N, S, W), padx=5, pady=1)
-            t_label.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=5)
-            t_entry.grid(column=1, row=1, sticky=(N, S, W), padx=1, pady=5)
-            resample_button.grid(column=2, row=0, rowspan=2, sticky=(N, S, E, W), padx=5, pady=1)
-            confirm_sample_button.grid(column=3, row=0, rowspan=2, sticky=(N, S, E, W), padx=5, pady=1)
+            t_label.grid(column=0, row=2, columnspan=2, sticky=(N, S, E), padx=1, pady=5)
+            t_entry.grid(column=2, row=2, columnspan=2, sticky=(N, S, W), padx=1, pady=5)
+            sx_label.grid(column=0, row=3, sticky=(N, S, E), padx=1, pady=5)
+            sx_entry.grid(column=1, row=3, sticky=(N, S, W), padx=1, pady=5)
+            sy_label.grid(column=2, row=3, sticky=(N, S, E), padx=1, pady=5)
+            sy_entry.grid(column=3, row=3, sticky=(N, S, W), padx=1, pady=5)
+            st_label.grid(column=0, row=4, columnspan=2, sticky=(N, S, E), padx=1, pady=5)
+            st_entry.grid(column=2, row=4, columnspan=2, sticky=(N, S, W), padx=1, pady=5)
+            resample_button.grid(column=4, row=0, rowspan=5, sticky=(N, S, E, W), padx=5, pady=1)
+            confirm_sample_button.grid(column=5, row=0, rowspan=5, sticky=(N, S, E, W), padx=5, pady=1)
 
             emode_frame.columnconfigure(0, weight=1)
             emode_frame.columnconfigure(1, weight=1)
             emode_frame.columnconfigure(2, weight=1)
             emode_frame.columnconfigure(3, weight=1)
+            emode_frame.columnconfigure(4, weight=1)
+            emode_frame.columnconfigure(5, weight=1)
             emode_frame.rowconfigure(0, weight=1)
             emode_frame.rowconfigure(1, weight=1)
+            emode_frame.rowconfigure(2, weight=1)
+            emode_frame.rowconfigure(3, weight=1)
+            emode_frame.rowconfigure(4, weight=1)
+
+            type_switch_frame.columnconfigure(0, weight=1)
+            type_switch_frame.columnconfigure(1, weight=1)
+            type_switch_frame.columnconfigure(2, weight=1)
+            type_switch_frame.rowconfigure(0, weight=1)
 
             bbox_frame.columnconfigure(0, weight=1)
             bbox_frame.columnconfigure(1, weight=1)
@@ -466,6 +529,9 @@ def TOAD_GUI():
         else:
             # Hide all the things
             emode_frame.grid_forget()
+            type_switch_label.forget()
+            type_switch_0.forget()
+            type_switch_1.forget()
             bbox_frame.grid_forget()
             x1_label.grid_forget()
             x1_entry.grid_forget()
