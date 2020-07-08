@@ -48,11 +48,22 @@ def generate_spatial_noise(size, device, *args, **kwargs):
     return torch.randn(size, device=device)
 
 
-def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, token_list, in_s=None, scale_v=1.0, scale_h=1.0,
-                    current_scale=0, gen_start_scale=0, num_samples=1):
+def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, token_list, in_states=None, scale_v=1.0,
+                    scale_h=1.0, current_scale=0, gen_start_scale=0):
+
+    if not in_states or gen_start_scale == 0:
+        in_s = None
+        images_cur = []
+        images = []
+        z_s = []
+    else:
+        images_cur = in_states[0][0:gen_start_scale]
+        z_s = in_states[1][0:gen_start_scale]
+
+        images = images_cur
+        in_s = images[0]
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    images_cur = []
 
     for G, Z_opt, noise_amp in zip(generators, noise_maps, noise_amplitudes):
         if current_scale >= len(generators):
@@ -60,18 +71,18 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
         pad1 = int(1 * num_layer)
         m = nn.ZeroPad2d(int(pad1))
 
-        if gen_start_scale > 0:
-            if current_scale >= gen_start_scale:
-                scale_v = in_s.shape[2] / (noise_maps[gen_start_scale-1].shape[2] - pad1 * 2)
-                scale_h = in_s.shape[3] / (noise_maps[gen_start_scale-1].shape[3] - pad1 * 2)
-                nzx = (Z_opt.shape[2] - pad1 * 2) * scale_v
-                nzy = (Z_opt.shape[3] - pad1 * 2) * scale_h
-            else:
-                nzx = (Z_opt.shape[2] - pad1 * 2) * scale_v
-                nzy = (Z_opt.shape[3] - pad1 * 2) * scale_h
-        else:
-            nzx = (Z_opt.shape[2] - pad1 * 2) * scale_v
-            nzy = (Z_opt.shape[3] - pad1 * 2) * scale_h
+        # if gen_start_scale > 0:
+            # if current_scale >= gen_start_scale:
+            #     scale_v = in_s.shape[2] / (noise_maps[gen_start_scale-1].shape[2] - pad1 * 2)
+            #     scale_h = in_s.shape[3] / (noise_maps[gen_start_scale-1].shape[3] - pad1 * 2)
+            #     nzx = (Z_opt.shape[2] - pad1 * 2) * scale_v
+            #     nzy = (Z_opt.shape[3] - pad1 * 2) * scale_h
+            # else:
+            #     nzx = (Z_opt.shape[2] - pad1 * 2) * scale_v
+            #     nzy = (Z_opt.shape[3] - pad1 * 2) * scale_h
+        # else:
+        nzx = (Z_opt.shape[2] - pad1 * 2) * scale_v
+        nzy = (Z_opt.shape[3] - pad1 * 2) * scale_h
 
         images_prev = images_cur
         images_cur = []
@@ -82,28 +93,35 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
         elif in_s.sum() == 0:
             in_s = torch.zeros(in_s.shape[0], channels, *in_s.shape[2:]).to(device)
 
-        for i in range(0, num_samples, 1):
-            if current_scale == 0:
-                z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
-                z_curr = m(z_curr)
-            else:
-                z_curr = generate_spatial_noise([1, int(round(nzx)), int(round(nzy))], device=device)
-                z_curr = m(z_curr.unsqueeze(0)).squeeze(0)
-
-            if not images_prev:
-                I_prev = in_s
-            else:
-                I_prev = images_prev[i]
-            I_prev = interpolate(I_prev, [int(round(nzx)), int(round(nzy))], mode='bilinear', align_corners=False)
-            I_prev = m(I_prev)
-
+        if current_scale == 0:
+            z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
+            z_curr = m(z_curr)
+        else:
             if current_scale < gen_start_scale:
-                z_curr = Z_opt
+                z_curr = z_s[current_scale]
+            else:
+                z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
+                # z_curr = m(z_curr.unsqueeze(0)).squeeze(0)
+                z_curr = m(z_curr)
 
-            z_in = noise_amp * z_curr + I_prev
-            I_curr = G(z_in.detach(), I_prev, temperature=1)
+        if not images_prev:
+            I_prev = in_s
+        else:
+            I_prev = images[current_scale-1]
+        I_prev = interpolate(I_prev, [int(round(nzx)), int(round(nzy))], mode='bilinear', align_corners=False)
+        I_prev = m(I_prev)
 
-            images_cur.append(I_curr)
+        # if current_scale < gen_start_scale:
+        #     z_curr = Z_opt
+
+        z_in = noise_amp * z_curr + I_prev
+        I_curr = G(z_in.detach(), I_prev, temperature=1)
+
+        images_cur.append(I_curr)
+
+        if current_scale >= gen_start_scale:
+            images.append(I_curr.detach())
+            z_s.append(z_curr.detach())
         current_scale += 1
 
-    return I_curr.detach()
+    return I_curr.detach(), images, z_s
