@@ -49,7 +49,7 @@ def generate_spatial_noise(size, device, *args, **kwargs):
 
 
 def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, token_list, in_states=None, scale_v=1.0,
-                    scale_h=1.0, current_scale=0, gen_start_scale=0):
+                    scale_h=1.0, current_scale=0, gen_start_scale=0, is_bboxed=False, bbox=(0, 0, 0, 0)):
 
     if not in_states or gen_start_scale == 0:
         in_s = None
@@ -61,7 +61,8 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
         z_s = in_states[1][0:gen_start_scale]
 
         images = images_cur
-        in_s = images[0]
+        in_s = None
+
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -94,17 +95,34 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
             in_s = torch.zeros(in_s.shape[0], channels, *in_s.shape[2:]).to(device)
 
         if current_scale == 0:
-            z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
-            z_curr = m(z_curr)
+            if is_bboxed:
+                z_noise = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
+                z_noise = m(z_noise)
+                z_curr = in_states[1][current_scale]
+                z_curr[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1] = \
+                    z_noise[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1]
+            else:
+                z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
+                z_curr = m(z_curr)
         else:
             if current_scale < gen_start_scale:
                 z_curr = z_s[current_scale]
             else:
-                z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
-                # z_curr = m(z_curr.unsqueeze(0)).squeeze(0)
-                z_curr = m(z_curr)
+                if is_bboxed:
+                    if current_scale == gen_start_scale:
+                        z_noise = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
+                        z_noise = m(z_noise)
+                        z_curr = in_states[1][current_scale]
+                        z_curr[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1] = \
+                            z_noise[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1]
+                    else:
+                        z_curr = in_states[1][current_scale]
+                else:
+                    z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
+                    # z_curr = m(z_curr.unsqueeze(0)).squeeze(0)
+                    z_curr = m(z_curr)
 
-        if not images_prev:
+        if (not images_prev) or current_scale == 0:
             I_prev = in_s
         else:
             I_prev = images[current_scale-1]

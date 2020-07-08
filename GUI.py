@@ -506,12 +506,16 @@ def TOAD_GUI():
                 is_loaded.set(True)
             elif edit_type.get() == "toadgan":
                 is_loaded.set(False)
+                sc = level_obj.scales[edit_scale.get()].shape[-1] / level_obj.oh_level.shape[-1]
+                scaled_bbox = (round(bbox_x1.get() * sc), round(bbox_x2.get() * sc),
+                               round(bbox_y1.get() * sc), round(bbox_y2.get() * sc))
 
                 new_states = [level_obj.scales, level_obj.noises]
                 level, scales, noises = generate_sample(toadgan_obj.Gs, toadgan_obj.Zs, toadgan_obj.reals,
                                                         toadgan_obj.NoiseAmp, toadgan_obj.num_layers,
                                                         toadgan_obj.token_list, in_states=new_states,
-                                                        gen_start_scale=edit_scale.get())
+                                                        gen_start_scale=edit_scale.get(), is_bboxed=True,
+                                                        bbox=scaled_bbox)
                 level_obj.oh_level = level.cpu()
                 level_obj.scales = scales
                 level_obj.noises = noises
