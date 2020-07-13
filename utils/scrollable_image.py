@@ -8,9 +8,10 @@ class ScrollableImage(Canvas):
     def __init__(self, master=None, **kw):
         self.image = kw.pop('image', None)
         super(ScrollableImage, self).__init__(master=master, **kw)
+        self.is_first_level = False
         self['highlightthickness'] = 0
         self.propagate(0)  # wont let the scrollbars rule the size of Canvas
-        self.create_image(0, 0, anchor='nw', image=self.image)
+        self.create_image(0, 0, anchor='nw', image=self.image, tag='image')
         # Vertical and Horizontal scrollbars
         self.v_scroll = ttk.Scrollbar(self, orient='vertical')  # , width=6)
         self.h_scroll = ttk.Scrollbar(self, orient='horizontal')  # , width=6)
@@ -52,13 +53,13 @@ class ScrollableImage(Canvas):
 
     def change_image(self, im):
         self.image = im
-        self.create_image(0, 0, anchor='nw', image=self.image)
+        self.delete('image')
+        self.create_image(0, 0, anchor='nw', image=self.image, tag='image')
         # Assign the region to be scrolled
-        self.config(scrollregion=self.bbox('all'))
-        # self.xview_moveto(0)
-
-        # Known Bug: When loading a smaller image after loading a larger one, the scrollbar will not shrink to that
-        # image again.
+        self.config(scrollregion=self.bbox('image'))
+        if not self.is_first_level:  # if it's the first level scroll to the beginning (placeholder can move scrollbar)
+            self.xview_moveto(0)
+            self.is_first_level = True
 
     def move_scrollbar_to_middle(self):
         x1, x2 = self.xview()
