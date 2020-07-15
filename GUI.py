@@ -372,9 +372,6 @@ def TOAD_GUI():
     controls_frame.rowconfigure(2, weight=1)
     controls_frame.rowconfigure(3, weight=1)
 
-    # Move scrollbar to middle (to have message on the test image appear centered)
-    root.after(1, image_label.move_scrollbar_to_middle)
-
     # -------------------- Handling Editmode -----------------------------
 
     # Variables
@@ -685,6 +682,10 @@ def TOAD_GUI():
     bbox_x2.trace("w", callback=update_scale_info)
     bbox_y1.trace("w", callback=update_scale_info)
     bbox_y2.trace("w", callback=update_scale_info)
+
+    root.update()
+    # Move scrollbar to middle (to have message on the test image appear centered)
+    root.after(1, image_label.move_scrollbar_to_middle)
 
     # Run Window
     root.mainloop()
