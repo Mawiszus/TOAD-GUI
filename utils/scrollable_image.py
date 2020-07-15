@@ -57,7 +57,7 @@ class ScrollableImage(Canvas):
         self.create_image(0, 0, anchor='nw', image=self.image, tag='image')
         # Assign the region to be scrolled
         scroll_bbox = self.bbox('image')
-        self.config(scrollregion=(scroll_bbox[0], scroll_bbox[1], scroll_bbox[2]+16, scroll_bbox[3]+16))
+        self.config(scrollregion=(scroll_bbox[0], scroll_bbox[1], scroll_bbox[2]+17, scroll_bbox[3]+17))
         if not self.is_first_level:  # if it's the first level scroll to the beginning (placeholder can move scrollbar)
             self.xview_moveto(0)
             self.is_first_level = True
@@ -65,4 +65,3 @@ class ScrollableImage(Canvas):
     def move_scrollbar_to_middle(self):
         x1, x2 = self.xview()
         self.xview_moveto(0.5 - (x2-x1)/2)
-
