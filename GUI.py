@@ -42,7 +42,8 @@ def TOAD_GUI():
     root = Tk(className=" TOAD-GUI")
 
     default_font = font.nametofont("TkDefaultFont")
-    default_font.configure(size=9)
+    if platform.system() == 'Windows':
+        default_font.configure(size=8)
     root.option_add("*Fontsize", default_font)
 
     # Functions to keep GUI alive when playing/loading/generating
@@ -326,16 +327,16 @@ def TOAD_GUI():
 
     # Pack layout to grid
     settings.grid(column=0, row=0, sticky=(N, S, E, W))
-    banner.grid(column=1, row=0, columnspan=2, sticky=(N, S), padx=5)
-    welcome_message.grid(column=1, row=1, columnspan=2, sticky=(N, S), padx=5, pady=10)
+    banner.grid(column=1, row=0, columnspan=2, sticky=(N, S))
+    welcome_message.grid(column=1, row=1, columnspan=2, sticky=(N, S), padx=5, pady=8)
     load_lev_button.grid(column=2, row=3, sticky=(N, S, E, W), padx=5, pady=5)
     load_gen_button.grid(column=1, row=3, sticky=(N, S, E, W), padx=5, pady=5)
     gen_button.grid(column=1, row=4, sticky=(N, S, E, W), padx=5, pady=5)
     save_button.grid(column=2, row=4, sticky=(N, S, E, W), padx=5, pady=5)
-    prev_label.grid(column=0, row=5, columnspan=4, sticky=(S, W), padx=5, pady=5)
+    # prev_label.grid(column=0, row=5, columnspan=4, sticky=(S, W), padx=5, pady=5)
     image_label.grid(column=0, row=6, columnspan=4, sticky=(N, E, W), padx=5, pady=5)
     p_c_frame.grid(column=1, row=7, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
-    fpath_label.grid(column=0, row=99, columnspan=4, sticky=(S, E, W), padx=5, pady=10)
+    fpath_label.grid(column=0, row=99, columnspan=4, sticky=(S, E, W), padx=5, pady=5)
     error_label.grid(column=0, row=100, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
 
     play_button.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
