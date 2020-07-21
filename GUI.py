@@ -26,6 +26,8 @@ if platform.system() == "Windows":
     my_appid = u'toad-gui.1.0'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(my_appid)
 
+    ctypes.windll.shcore.SetProcessDpiAwareness(True)
+
 
 class LevelObject:
     def __init__(self, ascii_level, oh_level, image, tokens, scales, noises):
@@ -40,11 +42,6 @@ class LevelObject:
 def TOAD_GUI():
     # Init Window
     root = Tk(className=" TOAD-GUI")
-
-    default_font = font.nametofont("TkDefaultFont")
-    if platform.system() == 'Windows':
-        default_font.configure(size=8)
-    root.option_add("*Fontsize", default_font)
 
     # Functions to keep GUI alive when playing/loading/generating
     class ThreadedClient(threading.Thread):
@@ -334,7 +331,7 @@ def TOAD_GUI():
     gen_button.grid(column=1, row=4, sticky=(N, S, E, W), padx=5, pady=5)
     save_button.grid(column=2, row=4, sticky=(N, S, E, W), padx=5, pady=5)
     # prev_label.grid(column=0, row=5, columnspan=4, sticky=(S, W), padx=5, pady=5)
-    image_label.grid(column=0, row=6, columnspan=4, sticky=(N, E, W), padx=5, pady=5)
+    image_label.grid(column=0, row=6, columnspan=4, sticky=(N, E, W), padx=5, pady=8)
     p_c_frame.grid(column=1, row=7, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
     fpath_label.grid(column=0, row=99, columnspan=4, sticky=(S, E, W), padx=5, pady=5)
     error_label.grid(column=0, row=100, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
