@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
+from tkinter import font
 from PIL import ImageTk, Image, ImageFont, ImageDraw
 from py4j.java_gateway import JavaGateway
 import os
@@ -39,6 +40,10 @@ class LevelObject:
 def TOAD_GUI():
     # Init Window
     root = Tk(className=" TOAD-GUI")
+
+    default_font = font.nametofont("TkDefaultFont")
+    default_font.configure(size=9)
+    root.option_add("*Fontsize", default_font)
 
     # Functions to keep GUI alive when playing/loading/generating
     class ThreadedClient(threading.Thread):
