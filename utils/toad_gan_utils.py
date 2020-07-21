@@ -96,11 +96,14 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
 
         if current_scale == 0:
             if is_bboxed:
-                z_noise = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
-                z_noise = m(z_noise)
-                z_curr = in_states[1][current_scale]
-                z_curr[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1] = \
-                    z_noise[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1]
+                if gen_start_scale == 0:
+                    z_noise = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
+                    z_noise = m(z_noise)
+                    z_curr = in_states[1][current_scale]
+                    z_curr[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1] = \
+                        z_noise[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1]
+                else:
+                    z_curr = in_states[1][current_scale]
             else:
                 z_curr = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
                 z_curr = m(z_curr)

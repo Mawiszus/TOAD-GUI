@@ -321,7 +321,7 @@ def TOAD_GUI():
 
     # Pack layout to grid
     settings.grid(column=0, row=0, sticky=(N, S, E, W))
-    banner.grid(column=1, row=0, columnspan=2, sticky=(N, S), padx=5, pady=5)
+    banner.grid(column=1, row=0, columnspan=2, sticky=(N, S), padx=5)
     welcome_message.grid(column=1, row=1, columnspan=2, sticky=(N, S), padx=5, pady=10)
     load_lev_button.grid(column=2, row=3, sticky=(N, S, E, W), padx=5, pady=5)
     load_gen_button.grid(column=1, row=3, sticky=(N, S, E, W), padx=5, pady=5)
@@ -333,8 +333,8 @@ def TOAD_GUI():
     fpath_label.grid(column=0, row=99, columnspan=4, sticky=(S, E, W), padx=5, pady=10)
     error_label.grid(column=0, row=100, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
 
-    play_button.grid(column=0, row=0, sticky=(N, S, E, W), padx=5, pady=5)
-    controls_frame.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
+    play_button.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
+    controls_frame.grid(column=2, row=0, sticky=(E, W), padx=5, pady=5)
 
     contr_a.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=1)
     contr_s.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=1)
@@ -361,8 +361,8 @@ def TOAD_GUI():
     settings.rowconfigure(99, weight=1)
     settings.rowconfigure(100, weight=1)
 
-    p_c_frame.columnconfigure(0, weight=2)
-    p_c_frame.columnconfigure(0, weight=1)
+    p_c_frame.columnconfigure(1, weight=2)
+    p_c_frame.columnconfigure(2, weight=0)
     p_c_frame.rowconfigure(0, weight=1)
 
     controls_frame.columnconfigure(0, weight=1)
@@ -394,7 +394,7 @@ def TOAD_GUI():
     bbox_y1.set(0)
     bbox_y2.set(16)
     temp.set(6)
-    edit_type.set("tokenwise")
+    edit_type.set("toadgan")
     seed_x.set(8)
     seed_y.set(8)
     seed_token.set(0)
@@ -409,7 +409,7 @@ def TOAD_GUI():
     emode_box.grid(column=1, row=8, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
     settings.rowconfigure(8, weight=1)
 
-    emode_frame = ttk.LabelFrame(root, text="Edit mode controls", padding=(5, 5, 5, 5))
+    emode_frame = ttk.LabelFrame(p_c_frame, text="Edit mode controls", padding=(5, 5, 5, 5))
     type_switch_frame = ttk.Frame(emode_frame, padding=(0, 5, 0, 5))
     type_switch_label = ttk.Label(type_switch_frame, text="Edit Type:")
     type_switch_0 = ttk.Radiobutton(type_switch_frame, text="Tokenwise", variable=edit_type, value="tokenwise")
@@ -446,7 +446,7 @@ def TOAD_GUI():
     sc_frame = ttk.Frame(emode_frame, padding=(0, 5, 0, 5))
     sc_label = ttk.Label(sc_frame, text="Scale:")
     sc_entry = ttk.Entry(sc_frame, textvariable=edit_scale, validate="key", width=3, justify='right')
-    sc_noise_image = ttk.Label(sc_frame, image=noiseimage)
+    sc_noise_image = ttk.Label(emode_frame, image=noiseimage)
 
     sc_info_label = ttk.Label(sc_frame, textvariable=scale_info)
 
@@ -532,13 +532,15 @@ def TOAD_GUI():
     def toggle_editmode(t1, t2, t3):
         if editmode.get():
             # Grid all the things
-            emode_frame.grid(column=1, row=0, columnspan=2, sticky=(E, W), padx=10)
-            type_switch_frame.grid(column=0, row=0, columnspan=6, sticky=(N, S, E, W))
-            type_switch_label.grid(column=0, row=0, rowspan=2, sticky=(N, S, E), padx=5)
-            type_switch_0.grid(column=1, row=0, sticky=(N, S, E, W), padx=5)
-            type_switch_1.grid(column=2, row=0, sticky=(N, S, E, W), padx=5)
-            type_switch_2.grid(column=1, row=1, sticky=(N, S, E, W), padx=5)
-            bbox_frame.grid(column=0, row=1, columnspan=3, sticky=(E, W), padx=5, pady=5)
+            # p_c_frame.grid_configure(columnspan=1)
+            controls_frame.grid_configure(column=1, row=1)
+            emode_frame.grid(column=0, row=0, rowspan=2, sticky=(E, W), padx=10)
+            # type_switch_frame.grid(column=0, row=0, columnspan=6, sticky=(N, S, E, W))
+            # type_switch_label.grid(column=0, row=0, rowspan=2, sticky=(N, S, E), padx=5)
+            # type_switch_0.grid(column=1, row=0, sticky=(N, S, E, W), padx=5)
+            # type_switch_1.grid(column=2, row=0, sticky=(N, S, E, W), padx=5)
+            # type_switch_2.grid(column=1, row=1, sticky=(N, S, E, W), padx=5)
+            bbox_frame.grid(column=0, row=0, columnspan=1, sticky=(E, W), padx=5, pady=5)
             x1_label.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=1)
             x1_entry.grid(column=1, row=0, sticky=(N, S, W), padx=5, pady=1)
             x2_label.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=1)
@@ -547,17 +549,17 @@ def TOAD_GUI():
             y1_entry.grid(column=3, row=0, sticky=(N, S, W), padx=5, pady=1)
             y2_label.grid(column=2, row=1, sticky=(N, S, E), padx=1, pady=1)
             y2_entry.grid(column=3, row=1, sticky=(N, S, W), padx=5, pady=1)
-            t_label.grid(column=3, row=1, sticky=(E), padx=1, pady=5)
-            t_entry.grid(column=4, row=1, sticky=(W), padx=1, pady=5)
+            # t_label.grid(column=3, row=1, sticky=(E), padx=1, pady=5)
+            # t_entry.grid(column=4, row=1, sticky=(W), padx=1, pady=5)
             resample_button.grid(column=0, row=5, columnspan=3, sticky=(N, S, E, W), padx=5, pady=5)
-            confirm_sample_button.grid(column=3, row=5, columnspan=3, sticky=(N, S, E, W), padx=5, pady=5)
+            # confirm_sample_button.grid(column=3, row=5, columnspan=3, sticky=(N, S, E, W), padx=5, pady=5)
 
             emode_frame.columnconfigure(0, weight=1)
             emode_frame.columnconfigure(1, weight=1)
-            emode_frame.columnconfigure(2, weight=1)
-            emode_frame.columnconfigure(3, weight=1)
-            emode_frame.columnconfigure(4, weight=1)
-            emode_frame.columnconfigure(5, weight=1)
+            # emode_frame.columnconfigure(2, weight=1)
+            # emode_frame.columnconfigure(3, weight=1)
+            # emode_frame.columnconfigure(4, weight=1)
+            # emode_frame.columnconfigure(5, weight=1)
             emode_frame.rowconfigure(0, weight=1)
             emode_frame.rowconfigure(1, weight=1)
             emode_frame.rowconfigure(2, weight=1)
@@ -578,9 +580,12 @@ def TOAD_GUI():
             bbox_frame.rowconfigure(1, weight=1)
             redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
             update_scale_info(t1, t2, t3)
+            switch_edit_type(t1, t2, t3)
 
         else:
             # Hide all the things
+            # p_c_frame.grid_configure(columnspan=2)
+            controls_frame.grid_configure(column=2, row=0)
             emode_frame.grid_forget()
             redraw_image(False)
 
@@ -608,7 +613,7 @@ def TOAD_GUI():
             stat_frame.columnconfigure(5, weight=1)
         elif edit_type.get() == "toadgan":
             stat_frame.grid_forget()
-            sc_frame.grid(column=0, row=3, columnspan=5, sticky=(N, S, E, W), padx=5, pady=5)
+            sc_frame.grid(column=1, row=0, columnspan=5, sticky=(N, S, E, W), padx=5, pady=5)
             sc_label.grid(column=0, row=0, columnspan=1, sticky=(N, S, E), padx=1, pady=5)
             sc_entry.grid(column=1, row=0, columnspan=1, sticky=(N, S, W), padx=1, pady=5)
             sc_info_label.grid(column=0, row=1, columnspan=2, sticky=(N, S, E, W), padx=1, pady=5)
@@ -619,7 +624,7 @@ def TOAD_GUI():
             sc_frame.rowconfigure(0, weight=1)
             sc_frame.rowconfigure(1, weight=1)
             sc_frame.rowconfigure(2, weight=1)
-            edit_scale.set(0)
+            # edit_scale.set(0)
 
     edit_type.trace("w", callback=switch_edit_type)
 
@@ -641,9 +646,11 @@ def TOAD_GUI():
 
             redraw_image(True, rectangle=[(bbox_y1.get() * 16, bbox_x1.get() * 16),
                                           (bbox_y2.get() * 16, bbox_x2.get() * 16)])
-            scale_info.set(" Scale %d\n Noise amp: %.4f\n The bbox will be fitted to the noisemap.\n "
-                           "This may result in changes outside of the bbox."
-                           % (edit_scale.get(), toadgan_obj.NoiseAmp[edit_scale.get()]))
+            scale_info.set(# "Scale %d\n "
+                           "Noise amp: %.4f\n" % (toadgan_obj.NoiseAmp[edit_scale.get()]))
+                           # "The bbox will be fitted to the noisemap.\n "
+                           # "This may result in changes outside of the bbox."
+                           # % (edit_scale.get(), toadgan_obj.NoiseAmp[edit_scale.get()]))
             sc = level_obj.scales[edit_scale.get()].shape[-1] / level_obj.oh_level.shape[-1]
 
             scaled_bbox = [(round(bbox_y1.get() * sc), round(bbox_x1.get() * sc)),
