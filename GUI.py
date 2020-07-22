@@ -78,9 +78,14 @@ def TOAD_GUI():
     ImgGen = LevelImageGen(os.path.join(os.path.join(os.curdir, "utils"), "sprites"))
     current_level, current_tokens = read_level_from_file(os.path.join(os.curdir, "levels/originals"), "lvl_1-1.txt")
 
-    placeholder = Image.new('RGB', (690, 256), (255, 255, 255))
+    full_token_list = torch.load("stat_files/stat_token_list.pth")
+    token_img_dict = {}
+    for token in full_token_list:
+        token_img_dict[token] = ImageTk.PhotoImage(ImgGen.render([token]))
+
+    placeholder = Image.new('RGB', (890, 256), (255, 255, 255))
     draw = ImageDraw.Draw(placeholder)
-    draw.text((256, 128), "Level Preview will appear here.", (0, 0, 0))
+    draw.text((356, 128), "Level Preview will appear here.", (0, 0, 0))
     levelimage = ImageTk.PhotoImage(placeholder)
 
     level_obj = LevelObject(one_hot_to_ascii_level(current_level, current_tokens),
@@ -298,6 +303,33 @@ def TOAD_GUI():
     prev_label = ttk.Label(settings, text='Preview:')
     image_label = ScrollableImage(settings, image=levelimage, height=271)
 
+    # Popup Menu for token edit
+    def change_token(tok, x, y):
+        level_obj.oh_level[0, :, y, x] = 0
+        level_obj.oh_level[0, toadgan_obj.token_list.index(tok), y, x] = 1
+        level_obj.ascii_level = one_hot_to_ascii_level(level_obj.oh_level, toadgan_obj.token_list)
+        toggle_editmode(None, None, None)
+
+    def popup_edit(event):
+        e_menu = Menu(root, tearoff=0)
+        tok_x = int(event.widget.canvasx(event.x) / 16)
+        tok_y = int(event.widget.canvasy(event.y) / 16)
+
+        if is_loaded.get():
+            try:
+                for i, t in enumerate(toadgan_obj.token_list):
+                    e_menu.add_command(image=token_img_dict[t], label=t, compound='left',
+                                       command=lambda tok=t: change_token(tok, tok_x, tok_y))
+            except TypeError:
+                e_menu.add_command(label="No changeable Level loaded")
+        else:
+            e_menu.add_command(label="No changeable Level loaded")
+
+        e_menu.tk_popup(event.x_root, event.y_root)
+
+    image_label.bind("<Button-3>", popup_edit)
+
+    # Enable/Disable Buttons when loaded/unloaded
     def set_play_state(t1, t2, t3):
         if is_loaded.get():
             play_button.state(['!disabled'])
@@ -475,6 +507,9 @@ def TOAD_GUI():
 
     resample_button = ttk.Button(emode_frame, text="Resample", state='disabled',
                                  command=lambda: spawn_thread(q, re_sample))
+    sample_info = ttk.Label(emode_frame, text="Right click to edit Tokens directly.\n"
+                                              "Resampling will regenerate the level,\n"
+                                              "so prior Token edits will be reversed.")
     confirm_sample_button = ttk.Button(emode_frame, text="Confirm", state='disabled',
                                        command=lambda: spawn_thread(q, confirm_sample))
 
@@ -555,6 +590,7 @@ def TOAD_GUI():
             # t_label.grid(column=3, row=1, sticky=(E), padx=1, pady=5)
             # t_entry.grid(column=4, row=1, sticky=(W), padx=1, pady=5)
             resample_button.grid(column=0, row=5, columnspan=3, sticky=(N, S, E, W), padx=5, pady=5)
+            sample_info.grid(column=0, row=4, columnspan=3, sticky=(N, S), padx=5, pady=5)
             # confirm_sample_button.grid(column=3, row=5, columnspan=3, sticky=(N, S, E, W), padx=5, pady=5)
 
             emode_frame.columnconfigure(0, weight=1)
@@ -650,7 +686,8 @@ def TOAD_GUI():
             redraw_image(True, rectangle=[(bbox_y1.get() * 16, bbox_x1.get() * 16),
                                           (bbox_y2.get() * 16, bbox_x2.get() * 16)])
             scale_info.set(# "Scale %d\n "
-                           "Noise amp: %.4f\n" % (toadgan_obj.NoiseAmp[edit_scale.get()]))
+                           "Noise amp: %.4f\n"
+                           % (toadgan_obj.NoiseAmp[edit_scale.get()]))
                            # "The bbox will be fitted to the noisemap.\n "
                            # "This may result in changes outside of the bbox."
                            # % (edit_scale.get(), toadgan_obj.NoiseAmp[edit_scale.get()]))
