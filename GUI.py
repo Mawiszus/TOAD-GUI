@@ -327,7 +327,11 @@ def TOAD_GUI():
 
         e_menu.tk_popup(event.x_root, event.y_root)
 
-    image_label.bind("<Button-3>", popup_edit)
+    if platform.system() == 'Darwin':
+        image_label.bind("<Button-2>", popup_edit)
+    else:
+        image_label.bind("<Button-3>", popup_edit)
+
 
     # Enable/Disable Buttons when loaded/unloaded
     def set_play_state(t1, t2, t3):
