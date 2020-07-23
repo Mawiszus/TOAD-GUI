@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
-from tkinter import font
 from PIL import ImageTk, Image, ImageFont, ImageDraw
 from py4j.java_gateway import JavaGateway
 import os
@@ -10,6 +9,7 @@ import time
 import threading
 import queue
 import torch
+import math
 
 from utils.scrollable_image import ScrollableImage
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token, ascii_to_one_hot_level
@@ -216,7 +216,7 @@ def TOAD_GUI():
             error_msg.set("Level generated!")
         return
 
-    def redraw_image(edit_mode=False, rectangle=[(0, 0), (16, 16)], stat_mode=False, seed=(8*16, 8*16)):
+    def redraw_image(edit_mode=False, rectangle=[(0, 0), (16, 16)], stat_mode=False, seed=(8*16, 8*16), scale=0):
         if is_loaded.get():
             m_exists = False
             for line in level_obj.ascii_level:
@@ -238,6 +238,18 @@ def TOAD_GUI():
                     l_draw.multiline_text((6+x*16, 0), "".join(["%s\n" % c for c in str(x)]), (255, 255, 255),
                                           stroke_width=-1, stroke_fill=(0, 0, 0), direction='ttb', spacing=0, align='right')
                 l_draw.rectangle(rectangle, outline=(255, 0, 0), width=2)
+
+                # affected rectangle by noise change
+                n_pads = len(level_obj.scales) - scale
+                if n_pads > 0:  # if scale is chosen too big, this just does not render
+                    padding_effect = 3 * n_pads
+                    sc = level_obj.scales[scale].shape[-1] / level_obj.oh_level.shape[-1]
+                    scaling_effect = math.ceil((1/sc - 1) / 2)  # affected tokens in every direction
+                    aoe = (padding_effect + scaling_effect) * 16
+                    affected_rect = [(rectangle[0][0] - aoe, rectangle[0][1] - aoe),
+                                     (rectangle[1][0] + aoe, rectangle[1][1] + aoe)]
+                    l_draw.rectangle(affected_rect, outline=(255, 255, 0), width=2)
+
                 if stat_mode:
                     ellipse = [(rectangle[0][0] + seed[0], rectangle[0][1] + seed[1]),
                                (rectangle[0][0] + seed[0] + 16, rectangle[0][1] + seed[1] + 16)]
@@ -527,7 +539,8 @@ def TOAD_GUI():
                 tmp_lvl = level_obj.oh_level.clone()
                 tmp_lvl[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]] = samples[0]
                 level_obj.ascii_level = one_hot_to_ascii_level(tmp_lvl, toadgan_obj.token_list)
-                redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
+                redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16),
+                                              (bbox_y2.get()*16, bbox_x2.get()*16)], scale=edit_scale.get())
 
                 is_loaded.set(True)
             elif edit_type.get() == "stats":
@@ -540,7 +553,7 @@ def TOAD_GUI():
                 tmp_lvl[0, :, bbox[0]:bbox[1], bbox[2]:bbox[3]] = samples[0]
                 level_obj.ascii_level = one_hot_to_ascii_level(tmp_lvl, toadgan_obj.token_list)
                 redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)],
-                             stat_mode=True, seed=(seed_y.get()*16, seed_x.get()*16))
+                             stat_mode=True, seed=(seed_y.get()*16, seed_x.get()*16), scale=edit_scale.get())
                 is_loaded.set(True)
             elif edit_type.get() == "toadgan":
                 is_loaded.set(False)
@@ -559,7 +572,7 @@ def TOAD_GUI():
                 level_obj.noises = noises
 
                 level_obj.ascii_level = one_hot_to_ascii_level(level, toadgan_obj.token_list)
-                redraw_image()
+                redraw_image(scale=edit_scale.get())
 
                 is_loaded.set(True)
             else:
@@ -620,7 +633,8 @@ def TOAD_GUI():
             bbox_frame.columnconfigure(3, weight=1)
             bbox_frame.rowconfigure(0, weight=1)
             bbox_frame.rowconfigure(1, weight=1)
-            redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16), (bbox_y2.get()*16, bbox_x2.get()*16)])
+            redraw_image(True, rectangle=[(bbox_y1.get()*16, bbox_x1.get()*16),
+                                          (bbox_y2.get()*16, bbox_x2.get()*16)], scale=edit_scale.get())
             update_scale_info(t1, t2, t3)
             switch_edit_type(t1, t2, t3)
 
@@ -687,7 +701,7 @@ def TOAD_GUI():
                 bbox_x1.set(bbox_x2.get()-1)
 
             redraw_image(True, rectangle=[(bbox_y1.get() * 16, bbox_x1.get() * 16),
-                                          (bbox_y2.get() * 16, bbox_x2.get() * 16)])
+                                          (bbox_y2.get() * 16, bbox_x2.get() * 16)], scale=edit_scale.get())
             scale_info.set(# "Scale %d\n "
                            "Noise amp: %.4f\n"
                            % (toadgan_obj.NoiseAmp[edit_scale.get()]))
