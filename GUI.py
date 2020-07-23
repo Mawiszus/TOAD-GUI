@@ -332,7 +332,6 @@ def TOAD_GUI():
     else:
         image_label.bind("<Button-3>", popup_edit)
 
-
     # Enable/Disable Buttons when loaded/unloaded
     def set_play_state(t1, t2, t3):
         if is_loaded.get():
@@ -702,8 +701,13 @@ def TOAD_GUI():
 
             noise_holder = Image.fromarray(level_obj.noises[edit_scale.get()][0, 0, 3:-3, 3:-3].cpu().numpy()*255)
             noise_holder = noise_holder.convert('RGB')
-            n_draw = ImageDraw.Draw(noise_holder, 'RGBA')
-            n_draw.rectangle(scaled_bbox, fill=(255, 0, 0, 128))
+            if not (round(bbox_y1.get() * sc) == round(bbox_y2.get() * sc) or
+                    round(bbox_x1.get() * sc) == round(bbox_x2.get() * sc)):
+                n_draw = ImageDraw.Draw(noise_holder, 'RGBA')
+                rectanglebox = scaled_bbox
+                rectanglebox[1] = (max(round(bbox_y1.get() * sc), round(bbox_y2.get() * sc) - 1),
+                                   max(round(bbox_x1.get() * sc), round(bbox_x2.get() * sc) - 1))
+                n_draw.rectangle(rectanglebox, fill=(255, 0, 0, 128))
             noise_holder = noise_holder.resize((noise_holder.size[0] * 2, noise_holder.size[1] * 2), Image.NEAREST)
             noiseimage = ImageTk.PhotoImage(noise_holder)
             sc_noise_image.configure(image=noiseimage)
