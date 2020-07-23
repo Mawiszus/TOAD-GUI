@@ -29,6 +29,13 @@ if platform.system() == "Windows":
     ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
 
+def on_validate(in_str, act_type):
+    if act_type == '1':  # insertion
+        if not in_str.isdigit():
+            return False
+    return True
+
+
 class LevelObject:
     def __init__(self, ascii_level, oh_level, image, tokens, scales, noises):
         self.ascii_level = ascii_level
@@ -92,6 +99,8 @@ def TOAD_GUI():
                             current_level, levelimage, current_tokens, None, None)
     toadgan_obj = TOADGAN_obj(None, None, None, None, None, None)
 
+    level_l = IntVar()
+    level_h = IntVar()
     load_string_gen = StringVar()
     load_string_txt = StringVar()
     error_msg = StringVar()
@@ -99,6 +108,8 @@ def TOAD_GUI():
     is_loaded = BooleanVar()
     q = queue.Queue()
 
+    level_l.set(0)
+    level_h.set(0)
     load_string_gen.set("Click the buttons to open a level or generator.")
     load_string_txt.set(os.path.join(os.curdir, "levels"))
     error_msg.set("No Errors")
@@ -135,6 +146,9 @@ def TOAD_GUI():
                 level_obj.scales = None
                 level_obj.noises = None
 
+                level_l.set(lev.shape[-1])
+                level_h.set(lev.shape[-2])
+
                 use_gen.set(False)
                 is_loaded.set(True)
                 error_msg.set("Level loaded")
@@ -162,6 +176,9 @@ def TOAD_GUI():
             toadgan_obj.NoiseAmp = loadgan.NoiseAmp
             toadgan_obj.token_list = loadgan.token_list
             toadgan_obj.num_layers = loadgan.num_layers
+
+            level_l.set(toadgan_obj.reals[-1].shape[-1])
+            level_h.set(toadgan_obj.reals[-1].shape[-2])
 
             error_msg.set(msg)
 
@@ -195,9 +212,14 @@ def TOAD_GUI():
         else:
             error_msg.set("Generating level...")
             is_loaded.set(False)
+            # Get Scales from height and length
+            sc_h = level_h.get() / toadgan_obj.reals[-1].shape[-2]
+            sc_l = level_l.get() / toadgan_obj.reals[-1].shape[-1]
+
             level, scales, noises = generate_sample(toadgan_obj.Gs, toadgan_obj.Zs, toadgan_obj.reals,
                                                     toadgan_obj.NoiseAmp, toadgan_obj.num_layers,
-                                                    toadgan_obj.token_list)
+                                                    toadgan_obj.token_list,
+                                                    scale_h=sc_l, scale_v=sc_h)
             level_obj.oh_level = level.cpu()
             level_obj.scales = scales
             level_obj.noises = noises
@@ -292,18 +314,36 @@ def TOAD_GUI():
     load_gen_button = ttk.Button(settings, compound='top', image=load_generator_icon, width=35,
                                  text='Open Generator', command=lambda: spawn_thread(q, load_generator))
 
-    gen_button = ttk.Button(settings, compound='top', image=generate_level_icon,
-                            text='Generate level', state='disabled', command=lambda: spawn_thread(q, generate))
     save_button = ttk.Button(settings, compound='top', image=save_level_icon,
                              text='Save Level/Image', state='disabled', command=lambda: spawn_thread(q, save_txt))
+
+    gen_frame = ttk.Frame(settings)
+    gen_button = ttk.Button(gen_frame, compound='top', image=generate_level_icon,
+                            text='Generate level', state='disabled', command=lambda: spawn_thread(q, generate))
+
+    size_frame = ttk.Frame(gen_frame, padding=(1, 1, 1, 1))
+    h_label = ttk.Label(size_frame, text="X")
+    h_entry = ttk.Entry(size_frame, textvariable=level_h, validate="key", width=3, justify='right', state='disabled')
+    l_label = ttk.Label(size_frame, text="L")
+    l_entry = ttk.Entry(size_frame, textvariable=level_l, validate="key", width=3, justify='right', state='disabled')
+
+    vcmd_h = (h_entry.register(on_validate), '%P', '%d')
+    vcmd_l = (l_entry.register(on_validate), '%P', '%d')
+
+    h_entry.configure(validatecommand=vcmd_h)
+    l_entry.configure(validatecommand=vcmd_l)
 
     def set_button_state(t1, t2, t3):
         if use_gen.get():
             gen_button.state(['!disabled'])
             save_button.state(['!disabled'])
+            h_entry.state(['!disabled'])
+            l_entry.state(['!disabled'])
         else:
             gen_button.state(['disabled'])
             save_button.state(['disabled'])
+            h_entry.state(['disabled'])
+            l_entry.state(['disabled'])
         return
 
     use_gen.trace("w", callback=set_button_state)
@@ -375,7 +415,7 @@ def TOAD_GUI():
     welcome_message.grid(column=1, row=1, columnspan=2, sticky=(N, S), padx=5, pady=8)
     load_lev_button.grid(column=2, row=3, sticky=(N, S, E, W), padx=5, pady=5)
     load_gen_button.grid(column=1, row=3, sticky=(N, S, E, W), padx=5, pady=5)
-    gen_button.grid(column=1, row=4, sticky=(N, S, E, W), padx=5, pady=5)
+    gen_frame.grid(column=1, row=4, sticky=(N, S, E, W))
     save_button.grid(column=2, row=4, sticky=(N, S, E, W), padx=5, pady=5)
     # prev_label.grid(column=0, row=5, columnspan=4, sticky=(S, W), padx=5, pady=5)
     image_label.grid(column=0, row=6, columnspan=4, sticky=(N, E, W), padx=5, pady=8)
@@ -383,8 +423,16 @@ def TOAD_GUI():
     fpath_label.grid(column=0, row=99, columnspan=4, sticky=(S, E, W), padx=5, pady=5)
     error_label.grid(column=0, row=100, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
 
+    gen_button.grid(column=0, row=0, sticky=(N, S, E, W), padx=5, pady=5)
+    size_frame.grid(column=1, row=0, sticky=(E, W), padx=5, pady=5)
+
+    h_label.grid(column=1, row=1, sticky=(N, S), padx=1, pady=2)
+    h_entry.grid(column=1, row=0, sticky=(N, S), padx=1, pady=2)
+    # l_label.grid(column=0, row=2, sticky=(N, S, E), padx=1, pady=2)
+    l_entry.grid(column=1, row=2, sticky=(N, S), padx=1, pady=2)
+
     play_button.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
-    controls_frame.grid(column=2, row=0, sticky=(E, W), padx=5, pady=5)
+    controls_frame.grid(column=2, row=0, sticky=(N, S, E, W), padx=5, pady=5)
 
     contr_a.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=1)
     contr_s.grid(column=0, row=1, sticky=(N, S, E), padx=1, pady=1)
@@ -410,6 +458,10 @@ def TOAD_GUI():
     settings.rowconfigure(6, weight=2)
     settings.rowconfigure(99, weight=1)
     settings.rowconfigure(100, weight=1)
+
+    gen_frame.columnconfigure(0, weight=1)
+    gen_frame.columnconfigure(1, weight=0)
+    gen_frame.rowconfigure(0, weight=1)
 
     p_c_frame.columnconfigure(1, weight=2)
     p_c_frame.columnconfigure(2, weight=0)
@@ -467,12 +519,6 @@ def TOAD_GUI():
     type_switch_2 = ttk.Radiobutton(type_switch_frame, text="TOAD-GAN resample", variable=edit_type, value="toadgan")
 
     bbox_frame = ttk.LabelFrame(emode_frame, text="Bounding Box", padding=(5, 5, 5, 5))
-
-    def on_validate(inStr, act_type):
-        if act_type == '1':  # insertion
-            if not inStr.isdigit():
-                return False
-        return True
 
     x1_label = ttk.Label(bbox_frame, text="x1:", width=5, anchor="e")
     x1_entry = ttk.Entry(bbox_frame, textvariable=bbox_y1, validate="key", width=3, justify='right')
@@ -562,11 +608,14 @@ def TOAD_GUI():
                                round(bbox_y1.get() * sc), round(bbox_y2.get() * sc))
 
                 new_states = [level_obj.scales, level_obj.noises]
+                # Get Scales from height and length
+                sc_h = level_h.get() / toadgan_obj.reals[-1].shape[-2]
+                sc_l = level_l.get() / toadgan_obj.reals[-1].shape[-1]
                 level, scales, noises = generate_sample(toadgan_obj.Gs, toadgan_obj.Zs, toadgan_obj.reals,
                                                         toadgan_obj.NoiseAmp, toadgan_obj.num_layers,
                                                         toadgan_obj.token_list, in_states=new_states,
                                                         gen_start_scale=edit_scale.get(), is_bboxed=True,
-                                                        bbox=scaled_bbox)
+                                                        bbox=scaled_bbox, scale_v=sc_h, scale_h=sc_l)
                 level_obj.oh_level = level.cpu()
                 level_obj.scales = scales
                 level_obj.noises = noises
