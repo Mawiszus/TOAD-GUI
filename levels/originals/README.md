@@ -2,6 +2,8 @@
 
 The levels in this folder are taken from the VGLC: https://github.com/TheVGLC/TheVGLC
 
+Some levels were changed to make their tokens better fit the originals levels.
+
 Symbol Reference:
 - 'M': Mario Starting Position, not having it will force the engine to start at x = 0 and the first ground floor.
 - 'F': Mario finish line, not having it will force the engine to end at x = levelWidth and the first ground floor.

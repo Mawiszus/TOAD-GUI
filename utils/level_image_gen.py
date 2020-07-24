@@ -1,3 +1,4 @@
+# Code from https://github.com/awiszus/TOAD-GAN
 import os
 
 from PIL import Image, ImageOps, ImageEnhance

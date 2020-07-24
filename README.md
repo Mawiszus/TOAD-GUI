@@ -2,7 +2,7 @@
 
 TOAD-GUI is a Framework with which Super Mario Bros. levels can be randomly generated, loaded and saved.
 Generation is done with pre-trained [TOAD-GAN](https://tntgit:3000/awiszus/TOAD-GAN). 
-For more information on TOAD-GAN, please refer to the paper (link to be added) and the [github](https://tntgit:3000/awiszus/TOAD-GAN).
+For more information on TOAD-GAN, please refer to the paper (link to be added) and the github (link to added).
 
 <br/>
 <img align="center" alt="TOAD-GUI linux example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/dev/icons/TOAD_GUI_example.png">
@@ -70,6 +70,11 @@ Changes in a lower scale will result in larger changes in the final level.
 
 If you are interested in training your own Generator, refer to the TOAD-GAN github and copy the folder of your trained generator into the `generators/` folder.
 You should now be able to open it just like the provided generators.
+
+## Known Bugs
+
+* If the level play is quit using the window ('x' button in the corner), an error message regarding py4j will occur.
+In spite of that, the program should continue running normally.
 
 ## Built With
 

@@ -1,4 +1,4 @@
-# source https://stackoverflow.com/questions/56043767/show-large-image-using-scrollbar-in-python/56043976
+# based on https://stackoverflow.com/questions/56043767/show-large-image-using-scrollbar-in-python/56043976
 from tkinter import *
 from tkinter import ttk
 import platform
@@ -12,9 +12,10 @@ class ScrollableImage(Canvas):
         self['highlightthickness'] = 0
         self.propagate(0)  # wont let the scrollbars rule the size of Canvas
         self.create_image(0, 0, anchor='nw', image=self.image, tag='image')
+
         # Vertical and Horizontal scrollbars
-        self.v_scroll = ttk.Scrollbar(self, orient='vertical')  # , width=6)
-        self.h_scroll = ttk.Scrollbar(self, orient='horizontal')  # , width=6)
+        self.v_scroll = ttk.Scrollbar(self, orient='vertical')
+        self.h_scroll = ttk.Scrollbar(self, orient='horizontal')
         self.v_scroll.pack(side='right', fill='y')
         self.h_scroll.pack(side='bottom', fill='x')
         # Set the scrollbars to the canvas
@@ -27,6 +28,8 @@ class ScrollableImage(Canvas):
         self.config(scrollregion=self.bbox('all'))
 
         self.focus_set()
+
+        # Bind Mousewheel
         if platform.system() == 'Linux':
             self.bind_class(self, "<Button-4>", self.mouse_scroll)
             self.bind_class(self, "<Button-5>", self.mouse_scroll)
@@ -52,13 +55,16 @@ class ScrollableImage(Canvas):
                 self.yview_scroll(-1*evt.delta, 'units')  # For MacOS
 
     def change_image(self, im):
+        # Set new image
         self.image = im
         self.delete('image')
         self.create_image(0, 0, anchor='nw', image=self.image, tag='image')
         # Assign the region to be scrolled
         scroll_bbox = self.bbox('image')
         self.config(scrollregion=(scroll_bbox[0], scroll_bbox[1], scroll_bbox[2]+17, scroll_bbox[3]+17))
-        if not self.is_first_level:  # if it's the first level scroll to the beginning (placeholder can move scrollbar)
+
+        # If it's the first loaded level scroll to the beginning (placeholder can move scrollbar)
+        if not self.is_first_level:
             self.xview_moveto(0)
             self.is_first_level = True
 

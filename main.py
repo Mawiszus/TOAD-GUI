@@ -1,4 +1,4 @@
-# Main Function calling the GUI
+# Main Function just calling the GUI
 from GUI import TOAD_GUI
 
 if __name__ == '__main__':
