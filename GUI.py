@@ -151,6 +151,7 @@ def TOAD_GUI():
 
                 use_gen.set(False)
                 is_loaded.set(True)
+                set_button_state(None, None, None)
                 error_msg.set("Level loaded")
             else:
                 error_msg.set("No level file selected.")
@@ -182,8 +183,8 @@ def TOAD_GUI():
 
             error_msg.set(msg)
 
-            use_gen.set(True)
             is_loaded.set(False)
+            use_gen.set(True)
 
         except Exception:
             error_msg.set("Could not load generator. Is the filepath correct?")
@@ -234,6 +235,7 @@ def TOAD_GUI():
             #                                                     gen_start_scale=3)
 
             is_loaded.set(True)
+            set_button_state(None, None, None)
             print("Level generated!")
             error_msg.set("Level generated!")
         return
@@ -246,7 +248,8 @@ def TOAD_GUI():
                     m_exists = True
             if not m_exists:
                 level_obj.ascii_level = place_a_mario_token(level_obj.ascii_level)
-            level_obj.tokens = toadgan_obj.token_list
+            if use_gen.get():
+                level_obj.tokens = toadgan_obj.token_list
 
             pil_img = ImgGen.render(level_obj.ascii_level)
 
@@ -284,8 +287,8 @@ def TOAD_GUI():
 
     def play_level():
         error_msg.set("Playing level...")
-        use_gen.set(False)
         is_loaded.set(False)
+        use_gen.set(False)
         try:
             gateway = JavaGateway.launch_gateway(classpath=MARIO_AI_PATH, die_on_exit=True)
             game = gateway.jvm.engine.core.MarioGame()
@@ -321,10 +324,10 @@ def TOAD_GUI():
     gen_button = ttk.Button(gen_frame, compound='top', image=generate_level_icon,
                             text='Generate level', state='disabled', command=lambda: spawn_thread(q, generate))
 
-    size_frame = ttk.Frame(gen_frame, padding=(1, 1, 1, 1))
-    h_label = ttk.Label(size_frame, text="X")
+    size_frame = ttk.Frame(settings, padding=(1, 1, 1, 1))
+    h_label = ttk.Label(size_frame, text="Size:")
     h_entry = ttk.Entry(size_frame, textvariable=level_h, validate="key", width=3, justify='right', state='disabled')
-    l_label = ttk.Label(size_frame, text="L")
+    l_label = ttk.Label(size_frame, text="X")
     l_entry = ttk.Entry(size_frame, textvariable=level_l, validate="key", width=3, justify='right', state='disabled')
 
     vcmd_h = (h_entry.register(on_validate), '%P', '%d')
@@ -336,14 +339,23 @@ def TOAD_GUI():
     def set_button_state(t1, t2, t3):
         if use_gen.get():
             gen_button.state(['!disabled'])
-            save_button.state(['!disabled'])
+            if not is_loaded.get():
+                save_button.state(['disabled'])
+            else:
+                save_button.state(['!disabled'])
             h_entry.state(['!disabled'])
             l_entry.state(['!disabled'])
+            emode_box.state(['!disabled'])
         else:
             gen_button.state(['disabled'])
-            save_button.state(['disabled'])
+            if not is_loaded.get():
+                save_button.state(['disabled'])
+            else:
+                save_button.state(['!disabled'])
+                editmode.set(False)
             h_entry.state(['disabled'])
             l_entry.state(['disabled'])
+            emode_box.state(['disabled'])
         return
 
     use_gen.trace("w", callback=set_button_state)
@@ -358,8 +370,8 @@ def TOAD_GUI():
     # Popup Menu for token edit
     def change_token(tok, x, y):
         level_obj.oh_level[0, :, y, x] = 0
-        level_obj.oh_level[0, toadgan_obj.token_list.index(tok), y, x] = 1
-        level_obj.ascii_level = one_hot_to_ascii_level(level_obj.oh_level, toadgan_obj.token_list)
+        level_obj.oh_level[0, level_obj.tokens.index(tok), y, x] = 1
+        level_obj.ascii_level = one_hot_to_ascii_level(level_obj.oh_level, level_obj.tokens)
         toggle_editmode(None, None, None)
 
     def popup_edit(event):
@@ -369,9 +381,10 @@ def TOAD_GUI():
 
         if is_loaded.get():
             try:
-                for i, t in enumerate(toadgan_obj.token_list):
-                    e_menu.add_command(image=token_img_dict[t], label=t, compound='left',
-                                       command=lambda tok=t: change_token(tok, tok_x, tok_y))
+                for i, t in enumerate(level_obj.tokens):
+                    if not t == 'M':
+                        e_menu.add_command(image=token_img_dict[t], label=t, compound='left',
+                                           command=lambda tok=t: change_token(tok, tok_x, tok_y))
             except TypeError:
                 e_menu.add_command(label="No changeable Level loaded")
         else:
@@ -424,12 +437,12 @@ def TOAD_GUI():
     error_label.grid(column=0, row=100, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
 
     gen_button.grid(column=0, row=0, sticky=(N, S, E, W), padx=5, pady=5)
-    size_frame.grid(column=1, row=0, sticky=(E, W), padx=5, pady=5)
+    size_frame.grid(column=1, row=5, columnspan=1, sticky=(N, S), padx=5, pady=2)
 
-    h_label.grid(column=1, row=1, sticky=(N, S), padx=1, pady=2)
-    h_entry.grid(column=1, row=0, sticky=(N, S), padx=1, pady=2)
-    # l_label.grid(column=0, row=2, sticky=(N, S, E), padx=1, pady=2)
-    l_entry.grid(column=1, row=2, sticky=(N, S), padx=1, pady=2)
+    h_label.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=0)
+    h_entry.grid(column=1, row=0, sticky=(N, S), padx=1, pady=0)
+    l_label.grid(column=2, row=0, sticky=(N, S), padx=1, pady=0)
+    l_entry.grid(column=3, row=0, sticky=(N, S), padx=1, pady=0)
 
     play_button.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
     controls_frame.grid(column=2, row=0, sticky=(N, S, E, W), padx=5, pady=5)
@@ -456,6 +469,7 @@ def TOAD_GUI():
     settings.rowconfigure(4, weight=1)
     settings.rowconfigure(5, weight=1)
     settings.rowconfigure(6, weight=2)
+    settings.rowconfigure(7, weight=1)
     settings.rowconfigure(99, weight=1)
     settings.rowconfigure(100, weight=1)
 
@@ -507,7 +521,7 @@ def TOAD_GUI():
     noiseimage = ImageTk.PhotoImage(noise_holder)
 
     # Widgets
-    emode_box = ttk.Checkbutton(settings, text="Edit mode", variable=editmode)
+    emode_box = ttk.Checkbutton(settings, text="Edit mode", variable=editmode, state='disabled')
     emode_box.grid(column=1, row=8, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
     settings.rowconfigure(8, weight=1)
 
@@ -542,7 +556,7 @@ def TOAD_GUI():
     sc_frame = ttk.Frame(emode_frame, padding=(0, 5, 0, 5))
     sc_label = ttk.Label(sc_frame, text="Scale:")
     sc_entry = ttk.Entry(sc_frame, textvariable=edit_scale, validate="key", width=3, justify='right')
-    sc_noise_image = ttk.Label(emode_frame, image=noiseimage)
+    sc_noise_image = ScrollableImage(emode_frame, image=noiseimage, height=50, width=300)
 
     sc_info_label = ttk.Label(sc_frame, textvariable=scale_info)
 
@@ -658,7 +672,7 @@ def TOAD_GUI():
             sample_info.grid(column=0, row=4, columnspan=3, sticky=(N, S), padx=5, pady=5)
             # confirm_sample_button.grid(column=3, row=5, columnspan=3, sticky=(N, S, E, W), padx=5, pady=5)
 
-            emode_frame.columnconfigure(0, weight=1)
+            emode_frame.columnconfigure(0, weight=0)
             emode_frame.columnconfigure(1, weight=1)
             # emode_frame.columnconfigure(2, weight=1)
             # emode_frame.columnconfigure(3, weight=1)
@@ -773,8 +787,8 @@ def TOAD_GUI():
                 n_draw.rectangle(rectanglebox, fill=(255, 0, 0, 128))
             noise_holder = noise_holder.resize((noise_holder.size[0] * 2, noise_holder.size[1] * 2), Image.NEAREST)
             noiseimage = ImageTk.PhotoImage(noise_holder)
-            sc_noise_image.configure(image=noiseimage)
-            sc_noise_image.image = noiseimage
+            sc_noise_image.change_image(noiseimage)
+            # sc_noise_image.image = noiseimage
 
             resample_button.state(['!disabled'])
             confirm_sample_button.state(['!disabled'])
@@ -790,8 +804,8 @@ def TOAD_GUI():
             scale_info.set("No editable level loaded")
             noise_holder = Image.new('RGB', (8, 8), (255, 255, 255))
             noiseimage = ImageTk.PhotoImage(noise_holder)
-            sc_noise_image.configure(image=noiseimage)
-            sc_noise_image.image = noiseimage
+            sc_noise_image.change_image(noiseimage)
+            # sc_noise_image.image = noiseimage
             resample_button.state(['disabled'])
             confirm_sample_button.state(['disabled'])
 
