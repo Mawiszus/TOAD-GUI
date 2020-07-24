@@ -1,8 +1,8 @@
+# Code from https://github.com/awiszus/TOAD-GAN
 import numpy as np
 
 
 # Miscellaneous functions to deal with ascii-token-based levels.
-
 def load_level_from_text(path_to_level_txt):  # , replace_tokens=REPLACE_TOKENS):
     """ Loads an ascii level from a text file. """
     with open(path_to_level_txt, "r") as f:

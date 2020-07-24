@@ -1,4 +1,4 @@
-# Code based on https://github.com/tamarott/SinGAN
+# Code from https://github.com/awiszus/TOAD-GAN
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

@@ -1,3 +1,4 @@
+# Code from https://github.com/awiszus/TOAD-GAN
 import os
 
 from PIL import Image, ImageOps, ImageEnhance
@@ -97,7 +98,7 @@ class LevelImageGen:
 
         elif sprite_key == '%':  # jump through platform
             if curr_x == 0:
-                if ascii_level[curr_y][curr_x+1] == sprite_key:  # middle piece
+                if len(ascii_level[curr_y]) > 1 and ascii_level[curr_y][curr_x+1] == sprite_key:  # middle piece
                     actual_sprite = self.sprite_dict['%_m']
                 else:  # single_piece
                     actual_sprite = self.sprite_dict['%']
