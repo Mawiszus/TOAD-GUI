@@ -5,7 +5,7 @@ Generation is done with pre-trained [TOAD-GAN](https://tntgit:3000/awiszus/TOAD-
 For more information on TOAD-GAN, please refer to the paper (link to be added) and the [github](https://tntgit:3000/awiszus/TOAD-GAN).
 
 <br/>
-<img align="center" alt="TOAD-GUI linux example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD_GUI_example.png">
+<img align="center" alt="TOAD-GUI linux example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/dev/icons/TOAD_GUI_example.png">
 <br/><br/>
 
 This project uses the [Mario-AI-Framework](http://marioai.org/) by [Ahmed Khalifa](https://scholar.google.com/citations?user=DRcyg5kAAAAJ&hl=en) and includes graphics from the game _Super Mario Bros._ **It is not affiliated with or endorsed by Nintendo.
@@ -48,13 +48,23 @@ Make sure you are using the python installation you installed the prerequisites 
 When running TOAD-GUI you can:
 * ![toad folder](icons/folder_toad.png) Open a Generator (TOAD-GAN)
 * ![level folder](icons/folder_level.png) Open a (previously saved) level `.txt` to view and/or play
-* ![gear toad](icons/gear_toad.png) Generate a level (active only when a generator is loaded)
-* ![save button](icons/save_button.png) Save the generated level to a `.txt` or `.png` image file
+* ![gear toad](icons/gear_toad.png) Generate a level of the size defined in the entries below
+* ![save button](icons/save_button.png) Save the currently loaded level level to a `.txt` or `.png` image file
 * ![play button](icons/play_button.png) Play the currently loaded level
 
-The labels at the bottom will display the currently loaded path and information.
-If the an info is not yet displayed after clicking the corresponding button, it is still running the previous command!
-Impatiently clicking the button again might crash the program. 
+When a level is loaded, **right clicking** a point in the preview will allow you to change the token at that specific spot.
+If you resample the level, any changes made will be lost.
+
+The labels at the bottom will display the currently loaded path and information. 
+This program was made mostly by one researcher and is not optimized.
+Impatiently clicking buttons might crash the program.
+
+#### Edit Mode
+In this mode, parts of a generated level can be resampled with TOAD-GAN. 
+The red bounding box shows the area to be changed, while the yellow bounding box shows which blocks can still be affected by that change.
+The area of effect depends on the scale which is to be resampled and is a result of the Field of View produced by the convolutional layers.
+Changes in a lower scale will result in larger changes in the final level.
+
 
 ### TOAD-GAN
 

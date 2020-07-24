@@ -440,9 +440,9 @@ def TOAD_GUI():
     size_frame.grid(column=1, row=5, columnspan=1, sticky=(N, S), padx=5, pady=2)
 
     h_label.grid(column=0, row=0, sticky=(N, S, E), padx=1, pady=0)
-    h_entry.grid(column=1, row=0, sticky=(N, S), padx=1, pady=0)
+    l_entry.grid(column=1, row=0, sticky=(N, S), padx=1, pady=0)
     l_label.grid(column=2, row=0, sticky=(N, S), padx=1, pady=0)
-    l_entry.grid(column=3, row=0, sticky=(N, S), padx=1, pady=0)
+    h_entry.grid(column=3, row=0, sticky=(N, S), padx=1, pady=0)
 
     play_button.grid(column=1, row=0, sticky=(N, S, E, W), padx=5, pady=5)
     controls_frame.grid(column=2, row=0, sticky=(N, S, E, W), padx=5, pady=5)
@@ -584,7 +584,7 @@ def TOAD_GUI():
                                  command=lambda: spawn_thread(q, re_sample))
     sample_info = ttk.Label(emode_frame, text="Right click to edit Tokens directly.\n"
                                               "Resampling will regenerate the level,\n"
-                                              "so prior Token edits will be reversed.")
+                                              "so prior Token edits will be lost.")
     confirm_sample_button = ttk.Button(emode_frame, text="Confirm", state='disabled',
                                        command=lambda: spawn_thread(q, confirm_sample))
 
