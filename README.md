@@ -24,7 +24,7 @@ We recommend setting up a [virtual environment with pip](https://packaging.pytho
 and installing the packages there.
 
 ```
-$ pip3 install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
+$ pip3 install -r requirements.txt -f "https://download.pytorch.org/whl/torch_stable.html"
 ```
 Make sure you use the `pip3` that belongs to your previously defined virtual environment.
 
