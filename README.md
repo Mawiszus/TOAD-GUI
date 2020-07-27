@@ -5,8 +5,10 @@ Generation is done with pre-trained TOAD-GAN.
 For more information on TOAD-GAN, please refer to the paper (link to be added) and the github (link to added).
 
 <br/>
-<img align="center" alt="TOAD-GUI linux example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/dev/icons/TOAD_GUI_example.png">
-<br/><br/>
+<p align="center">
+<img alt="TOAD-GUI linux example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD_GUI_example.gif">
+</p>
+<br/>
 
 This project uses the [Mario-AI-Framework](http://marioai.org/) by [Ahmed Khalifa](https://scholar.google.com/citations?user=DRcyg5kAAAAJ&hl=en) and includes graphics from the game _Super Mario Bros._ **It is not affiliated with or endorsed by Nintendo.
 The project was built for research purposes only.**
@@ -65,6 +67,7 @@ The red bounding box shows the area to be changed, while the yellow bounding box
 The area of effect depends on the scale which is to be resampled and is a result of the Field of View produced by the convolutional layers.
 Changes in a lower scale will result in larger changes in the final level.
 
+![BBox example](icons/TOAD-GUI_crop.gif) ![Resample Scale 3](icons/TOAD-GUI_resample_sc3.gif) ![Resample Scale 0](icons/TOAD-GUI_resample_sc0.gif) ![Rightclick Edit](icons/TOAD-GUI_rightclick.gif)
 
 ### TOAD-GAN
 
