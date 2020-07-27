@@ -67,7 +67,10 @@ The red bounding box shows the area to be changed, while the yellow bounding box
 The area of effect depends on the scale which is to be resampled and is a result of the Field of View produced by the convolutional layers.
 Changes in a lower scale will result in larger changes in the final level.
 
-![BBox example](icons/TOAD-GUI_crop.gif) ![Resample Scale 3](icons/TOAD-GUI_resample_sc3.gif) ![Resample Scale 0](icons/TOAD-GUI_resample_sc0.gif) ![Rightclick Edit](icons/TOAD-GUI_rightclick.gif)
+![BBox example](icons/TOAD-GUI_crop.gif)
+![Resample Scale 3](icons/TOAD-GUI_resample_sc3.gif)
+![Resample Scale 0](icons/TOAD-GUI_resample_sc0.gif)
+![Rightclick Edit](icons/TOAD-GUI_rightclick.gif)
 
 ### TOAD-GAN
 
