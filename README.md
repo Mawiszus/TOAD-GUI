@@ -6,7 +6,7 @@ For more information on TOAD-GAN, please refer to the paper (link to be added) a
 
 <br/>
 <p align="center">
-<img alt="TOAD-GUI_linux_example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD_GUI_example.gif">
+<img alt="TOAD-GUI_linux_example" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_example.gif">
 </p>
 <br/>
 
@@ -67,10 +67,12 @@ The red bounding box shows the area to be changed, while the yellow bounding box
 The area of effect depends on the scale which is to be resampled and is a result of the Field of View produced by the convolutional layers.
 Changes in a lower scale will result in larger changes in the final level.
 
-![BBox_example](icons/TOAD-GUI_crop.gif)
-![Resample_Scale3](icons/TOAD-GUI_resample_sc3.gif)
-![Resample_Scale0](icons/TOAD-GUI_resample_sc0.gif)
-![Rightclick_Edit](icons/TOAD-GUI_rightclick.gif)
+<p align="left">
+<img alt="TOAD-GUI_bbox" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_crop.gif">
+<img alt="TOAD-GUI_sc3" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_resample_sc3.gif">
+<img alt="TOAD-GUI_sc0" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_resample_sc0.gif">
+<img alt="TOAD-GUI_edit" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_rightclick.gif">
+</p>
 
 ### TOAD-GAN
 
