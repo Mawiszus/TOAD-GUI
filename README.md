@@ -23,12 +23,8 @@ You will need [Python 3](https://www.python.org/downloads) and the packages spec
 We recommend setting up a [virtual environment with pip](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
 and installing the packages there.
 
-As TOAD-GAN uses **Pytorch** for its networks, we will need to install that, too.
-The Pytorch package needed can be very different depending on your system, so `pip3 install torch` will not work directly.
-Use the "Quick Start Locally" guide on [Pytorch.org](https://pytorch.org) to determine the correct package to install for your System.
-Afterwards, you can install all other requirements with:
 ```
-$ pip3 install -r requirements.txt
+$ pip3 install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 ```
 Make sure you use the `pip3` that belongs to your previously defined virtual environment.
 
