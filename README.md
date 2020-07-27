@@ -67,12 +67,23 @@ The red bounding box shows the area to be changed, while the yellow bounding box
 The area of effect depends on the scale which is to be resampled and is a result of the Field of View produced by the convolutional layers.
 Changes in a lower scale will result in larger changes in the final level.
 
-<p align="left">
-<img alt="TOAD-GUI_bbox" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_crop.gif">
-<img alt="TOAD-GUI_sc3" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_resample_sc3.gif">
-<img alt="TOAD-GUI_sc0" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_resample_sc0.gif">
-<img alt="TOAD-GUI_edit" src="https://tntgit:3000/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_rightclick.gif">
-</p>
+Use the control panel to set the bounding box. The representation inside the panel shows which pixels in the noise map will be changed.
+
+![TOAD-GUI_bbox](icons/TOAD-GUI_crop.gif)
+
+Resample the noise map in the chosen scale. The "Noise influence" is a learned parameter that indicates how big the effect of resampling in this scale will be.
+
+![TOAD-GUI_sc3](icons/TOAD-GUI_resample_sc3.gif)
+
+Scale 0 is the first scale and results in the most changes. Note that the tokens outside of the bounding box change. 
+This is because of the field of view from the convolutional layers applied to the noise map.
+
+![TOAD-GUI_sc0](icons/TOAD-GUI_resample_sc0.gif)
+
+You can right click a token you want to change and replace it with another token present in the level.
+This should be done after resampling, as resampling will regenerate the level from the noise maps which will undo these edits.
+
+![TOAD-GUI_edit](icons/TOAD-GUI_rightclick.gif)
 
 ### TOAD-GAN
 
