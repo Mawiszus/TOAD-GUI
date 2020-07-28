@@ -1,3 +1,5 @@
 /venv
+/env
+/.idea
 *.xcf
 __pycache__
