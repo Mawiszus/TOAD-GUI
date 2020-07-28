@@ -6,7 +6,7 @@ For more information on TOAD-GAN, please refer to the paper (link to be added) a
 
 <br/>
 <p align="center">
-<img alt="TOAD-GUI_linux_example" src="/awiszus/TOAD-GUI/media/branch/master/icons/TOAD-GUI_example.gif">
+<img alt="TOAD-GUI_linux_example" src="/icons/TOAD-GUI_example.gif">
 </p>
 <br/>
 
