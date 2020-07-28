@@ -108,6 +108,5 @@ In spite of that, the program should continue running normally.
 
 This program is not endorsed by Nintendo and is only intended for research purposes. 
 Mario is a Nintendo character which the authors don’t own any rights to. 
-Nintendo is also the sole owner of all the graphical assets in the game. 
-Any use of this program is expected to be on a non-commercial basis. 
+Nintendo is also the sole owner of all the graphical assets in the game.
 
