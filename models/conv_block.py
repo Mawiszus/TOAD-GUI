@@ -1,4 +1,4 @@
-# Code from https://github.com/awiszus/TOAD-GAN
+# Code from https://github.com/Mawiszus/TOAD-GAN
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

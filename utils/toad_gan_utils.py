@@ -1,4 +1,4 @@
-# Code in part from https://github.com/awiszus/TOAD-GAN
+# Code from https://github.com/Mawiszus/TOAD-GAN
 import torch
 import torch.nn as nn
 from torch.nn.functional import interpolate

@@ -1,4 +1,4 @@
-# Code from https://github.com/awiszus/TOAD-GAN
+# Code from https://github.com/Mawiszus/TOAD-GAN
 import numpy as np
 
 

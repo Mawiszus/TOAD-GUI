@@ -1,16 +1,14 @@
 # TOAD-GUI
 
-TOAD-GUI is a Framework with which Super Mario Bros. levels can be randomly generated, loaded and saved.
-Generation is done with pre-trained TOAD-GAN. 
-For more information on TOAD-GAN, please refer to the paper (link to be added) and the github (link to added).
+**TOAD-GUI** is a Framework with which _Super Mario Bros._ levels can be randomly generated, loaded and saved.
+Generation is done with pre-trained **TOAD-GAN**. 
+For more information on **TOAD-GAN**, please refer to the paper (link to be added) and the github (link to added).
 
-<br/>
 <p align="center">
 <img alt="TOAD-GUI_linux_example" src="/icons/TOAD-GUI_example.gif">
 </p>
-<br/>
 
-This project uses the [Mario-AI-Framework](http://marioai.org/) by [Ahmed Khalifa](https://scholar.google.com/citations?user=DRcyg5kAAAAJ&hl=en) and includes graphics from the game _Super Mario Bros._ **It is not affiliated with or endorsed by Nintendo.
+This project uses the [Mario-AI-Framework](https://github.com/amidos2006/Mario-AI-Framework) by [Ahmed Khalifa](https://scholar.google.com/citations?user=DRcyg5kAAAAJ&hl=en) and includes graphics from the game _Super Mario Bros._ **It is not affiliated with or endorsed by Nintendo.
 The project was built for research purposes only.**
 
 ## Getting Started
@@ -30,7 +28,7 @@ Make sure you use the `pip3` that belongs to your previously defined virtual env
 
 ### Java
 
-TOAD-GUI uses the [Mario-AI-Framework](http://marioai.org/) to play the generated levels.
+TOAD-GUI uses the [Mario-AI-Framework](https://github.com/amidos2006/Mario-AI-Framework) to play the generated levels.
 For the Framework to run, [Java](https://www.java.com/de/download/) needs to be installed.
 
 ## Running TOAD-GUI
