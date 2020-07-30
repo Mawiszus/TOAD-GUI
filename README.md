@@ -42,7 +42,7 @@ Make sure you are using the python installation you installed the prerequisites 
 ### TOAD-GUI
 
 When running TOAD-GUI you can:
-* ![toad folder](icons/folder_toad.png) Open a Generator (TOAD-GAN)
+* ![toad folder](icons/folder_toad.png) Open a Folder containing a Generator (TOAD-GAN)
 * ![level folder](icons/folder_level.png) Open a (previously saved) level `.txt` to view and/or play
 * ![gear toad](icons/gear_toad.png) Generate a level of the size defined in the entries below
 * ![save button](icons/save_button.png) Save the currently loaded level level to a `.txt` or `.png` image file
