@@ -127,7 +127,7 @@ def TOAD_GUI():
     def load_level():
         fname = fd.askopenfilename(title='Load Level', initialdir=os.path.join(os.curdir, 'levels'),
                                    filetypes=[("level .txt files", "*.txt")])
-        if fname is None:
+        if len(fname) is 0:
             return  # loading was cancelled
         try:
             error_msg.set("Loading level...")
@@ -174,7 +174,7 @@ def TOAD_GUI():
     def load_generator():
         fname = fd.askdirectory(title='Load Generator Directory', initialdir=os.path.join(os.curdir, 'generators'))
 
-        if fname is None:
+        if len(fname) is 0:
             return  # loading was cancelled
         try:
             error_msg.set("Loading generator...")
