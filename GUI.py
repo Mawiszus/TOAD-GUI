@@ -12,6 +12,7 @@ import torch
 import math
 
 from utils.scrollable_image import ScrollableImage
+from utils.tooltip import Tooltip
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token, ascii_to_one_hot_level
 from utils.level_image_gen import LevelImageGen
 from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_obj
@@ -533,6 +534,10 @@ def TOAD_GUI():
 
     # Set Edit mode Checkbox
     emode_box = ttk.Checkbutton(settings, text="Edit mode", variable=editmode, state='disabled')
+    em_tooltip = Tooltip(emode_box,
+                         text="Right click the image to change a token directly. \n"
+                              "Edit mode allows for resampling parts of a generated level.",
+                         wraplength=250, bg="white", enabled=True, waittime=100)
     emode_box.grid(column=1, row=8, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
     settings.rowconfigure(8, weight=1)
 
@@ -551,6 +556,14 @@ def TOAD_GUI():
     y2_label = ttk.Label(bbox_frame, text=" y2:")
     y2_entry = ttk.Entry(bbox_frame, textvariable=bbox_x2, validate="key", width=3, justify='right')
 
+    bbox_tt_string = "Controls the red bounding box. The yellow box shows which tokens are also " \
+                     "influenced by a change in this scale."
+
+    x1_tooltip = Tooltip(x1_label, text=bbox_tt_string, wraplength=250, bg="white", enabled=False)
+    x2_tooltip = Tooltip(x2_label, text=bbox_tt_string,  wraplength=250, bg="white", enabled=False)
+    y1_tooltip = Tooltip(y1_label, text=bbox_tt_string, wraplength=250, bg="white", enabled=False)
+    y2_tooltip = Tooltip(y2_label, text=bbox_tt_string, wraplength=250, bg="white", enabled=False)
+
     # Scale entry and
     sc_frame = ttk.Frame(emode_frame, padding=(0, 5, 0, 5))
     sc_label = ttk.Label(sc_frame, text="Scale:")
@@ -558,7 +571,16 @@ def TOAD_GUI():
 
     # Noise image and info label
     sc_noise_image = ScrollableImage(emode_frame, image=noiseimage, height=50, width=300)
+    noise_tooltip = Tooltip(sc_noise_image,
+                            text="This is a visualization of the noise map in the chosen scale. "
+                                 "Pixels to be resampled are marked red.",
+                            wraplength=250, bg="white", enabled=False)
+
     sc_info_label = ttk.Label(sc_frame, textvariable=scale_info)
+    sc_tooltip = Tooltip(sc_info_label,
+                         text="Noise influence is a learned parameter that indicates "
+                              "how much influence a change of the noise map will have on this scale.",
+                         wraplength=250, bg="white", enabled=False)
 
     # Entry Validation
     vcmd_x1 = (x1_entry.register(on_validate), '%P', '%d')
@@ -576,7 +598,7 @@ def TOAD_GUI():
     # Resample Button and info
     resample_button = ttk.Button(emode_frame, text="Resample", state='disabled',
                                  command=lambda: spawn_thread(q, re_sample))
-    sample_info = ttk.Label(emode_frame, text="Right click to edit Tokens directly.\n"
+    sample_info = ttk.Label(emode_frame, text=# "Right click to edit Tokens directly.\n"
                                               "Resampling will regenerate the level,\n"
                                               "so prior Token edits will be lost.")
 
@@ -700,6 +722,7 @@ def TOAD_GUI():
             # Show Noise Amplitude, which indicates how much influence this noise change will have
             scale_info.set("Noise influence: %.4f\n"
                            % (toadgan_obj.NoiseAmp[edit_scale.get()]))
+            sc_tooltip.enabled = True
 
             # Calculate scaled bounding box
             sc = level_obj.scales[edit_scale.get()].shape[-1] / level_obj.oh_level.shape[-1]
@@ -727,14 +750,31 @@ def TOAD_GUI():
             sc_noise_image.change_image(noiseimage)
 
             resample_button.state(['!disabled'])  # Allow resampling
+            noise_tooltip.enabled = True
+            x1_tooltip.enabled = True
+            x2_tooltip.enabled = True
+            y1_tooltip.enabled = True
+            y2_tooltip.enabled = True
 
         except TclError:
             scale_info.set("No scale")
             resample_button.state(['disabled'])
+            sc_tooltip.enabled = False
+            noise_tooltip.enabled = True
+            x1_tooltip.enabled = True
+            x2_tooltip.enabled = True
+            y1_tooltip.enabled = True
+            y2_tooltip.enabled = True
 
         except IndexError:
             scale_info.set("Scale out of range")
             resample_button.state(['disabled'])
+            sc_tooltip.enabled = False
+            noise_tooltip.enabled = True
+            x1_tooltip.enabled = True
+            x2_tooltip.enabled = True
+            y1_tooltip.enabled = True
+            y2_tooltip.enabled = True
 
         except TypeError:
             scale_info.set("No editable level loaded")
@@ -742,6 +782,12 @@ def TOAD_GUI():
             noiseimage = ImageTk.PhotoImage(noise_holder)
             sc_noise_image.change_image(noiseimage)
             resample_button.state(['disabled'])
+            sc_tooltip.enabled = False
+            noise_tooltip.enabled = False
+            x1_tooltip.enabled = False
+            x2_tooltip.enabled = False
+            y1_tooltip.enabled = False
+            y2_tooltip.enabled = False
 
     edit_scale.trace("w", callback=update_scale_info)
     bbox_x1.trace("w", callback=update_scale_info)
