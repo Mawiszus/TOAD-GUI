@@ -1,8 +1,8 @@
 # TOAD-GUI
 
-**TOAD-GUI** is a Framework with which _Super Mario Bros._ levels can be randomly generated, loaded and saved.
-Generation is done with pre-trained **TOAD-GAN**. 
-For more information on **TOAD-GAN**, please refer to the paper (link to be added) and the github (link to added).
+**TOAD-GUI** is a Framework with which _Super Mario Bros._ levels can be randomly generated, loaded and saved using a graphical user interface.
+Generation is done with pre-trained **TOAD-GAN** (**T**oken-based, **O**ne-shot **A**rbitrary **D**imension **G**enerative **A**dversarial **N**Network). 
+For more information on **TOAD-GAN**, please refer to the paper (link will be added) and the github (link will be added).
 
 <p align="center">
 <img alt="TOAD-GUI_linux_example" src="/icons/TOAD-GUI_example.gif">
@@ -99,8 +99,8 @@ In spite of that, the program should continue running normally.
 
 ## Authors
 
-* **Maren Awiszus** - Institut für Informationsverarbeitung, Leibniz University Hanover
-* **Frederik Schubert** - Institut für Informationsverarbeitung, Leibniz University Hanover
+* **[Maren Awiszus](https://www.tnt.uni-hannover.de/de/staff/awiszus/)** - Institut für Informationsverarbeitung, Leibniz University Hanover
+* **[Frederik Schubert](https://www.tnt.uni-hannover.de/de/staff/schubert/)** - Institut für Informationsverarbeitung, Leibniz University Hanover
 
 ## Copyright
 
