@@ -127,6 +127,8 @@ def TOAD_GUI():
     def load_level():
         fname = fd.askopenfilename(title='Load Level', initialdir=os.path.join(os.curdir, 'levels'),
                                    filetypes=[("level .txt files", "*.txt")])
+        if fname is None:
+            return  # loading was cancelled
         try:
             error_msg.set("Loading level...")
             is_loaded.set(False)
@@ -172,6 +174,8 @@ def TOAD_GUI():
     def load_generator():
         fname = fd.askdirectory(title='Load Generator Directory', initialdir=os.path.join(os.curdir, 'generators'))
 
+        if fname is None:
+            return  # loading was cancelled
         try:
             error_msg.set("Loading generator...")
             use_gen.set(False)
@@ -197,7 +201,7 @@ def TOAD_GUI():
             use_gen.set(True)
 
         except Exception:
-            error_msg.set("Could not load generator. Is the filepath correct?")
+            error_msg.set("Could not load generator. Confirm that all needed .pth files are in the chosen folder.")
 
         return
 
