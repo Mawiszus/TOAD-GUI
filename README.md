@@ -81,7 +81,7 @@ This should be done after resampling, as resampling will regenerate the level fr
 
 ### TOAD-GAN
 
-If you are interested in training your own Generator, refer to the TOAD-GAN github and copy the folder of your trained generator into the `generators/` folder.
+If you are interested in training your own Generator, refer to the [TOAD-GAN Github](https://github.com/Mawiszus/TOAD-GAN) and copy the folder of your trained generator into the `generators/` folder.
 You should now be able to open it just like the provided generators.
 
 ## Known Bugs
