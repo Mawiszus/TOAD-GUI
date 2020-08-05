@@ -70,12 +70,12 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
             break  # should not be reached
 
         # Zero Padding
-        pad1 = int(1 * num_layer)
-        m = nn.ZeroPad2d(int(pad1))
+        n_pad = int(1 * num_layer)
+        m = nn.ZeroPad2d(int(n_pad))
 
         # Calculate actual shape
-        nzx = (Z_opt.shape[2] - pad1 * 2) * scale_v
-        nzy = (Z_opt.shape[3] - pad1 * 2) * scale_h
+        nzx = (Z_opt.shape[2] - n_pad * 2) * scale_v
+        nzy = (Z_opt.shape[3] - n_pad * 2) * scale_h
 
         # Init images list
         images_prev = images_cur
@@ -94,8 +94,8 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
                     z_noise = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
                     z_noise = m(z_noise)
                     z_curr = in_states[1][current_scale]
-                    z_curr[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1] = \
-                        z_noise[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1]
+                    z_curr[0, :, bbox[0] + n_pad:bbox[1] + n_pad, bbox[2] + n_pad:bbox[3] + n_pad] = \
+                        z_noise[0, :, bbox[0] + n_pad:bbox[1] + n_pad, bbox[2] + n_pad:bbox[3] + n_pad]
                 else:
                     z_curr = in_states[1][current_scale]
             else:
@@ -110,8 +110,8 @@ def generate_sample(generators, noise_maps, reals, noise_amplitudes, num_layer, 
                         z_noise = generate_spatial_noise([1, channels, int(round(nzx)), int(round(nzy))], device=device)
                         z_noise = m(z_noise)
                         z_curr = in_states[1][current_scale]
-                        z_curr[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1] = \
-                            z_noise[0, :, bbox[0] + pad1:bbox[1] + pad1, bbox[2] + pad1:bbox[3] + pad1]
+                        z_curr[0, :, bbox[0] + n_pad:bbox[1] + n_pad, bbox[2] + n_pad:bbox[3] + n_pad] = \
+                            z_noise[0, :, bbox[0] + n_pad:bbox[1] + n_pad, bbox[2] + n_pad:bbox[3] + n_pad]
                     else:
                         z_curr = in_states[1][current_scale]
                 else:
