@@ -11,6 +11,13 @@ For more information on **TOAD-GAN**, please refer to the paper ([arxiv link](ht
 This project uses the [Mario-AI-Framework](https://github.com/amidos2006/Mario-AI-Framework) by [Ahmed Khalifa](https://scholar.google.com/citations?user=DRcyg5kAAAAJ&hl=en) and includes graphics from the game _Super Mario Bros._ **It is not affiliated with or endorsed by Nintendo.
 The project was built for research purposes only.**
 
+### AIIDE 2020
+
+Our paper "TOAD-GAN: Coherent Style Level Generation from a Single Example" was accepted for oral presentation at [AIIDE 2020](https://webdocs.cs.ualberta.ca/~santanad/aiide/index.html)!
+
+Our code for TOAD-GUI and TOAD-GAN has been accepted for the AIIDE 2020 Artifact Evaluation Track! 
+It will be recognized in the [AIIDE 2020 Program](https://webdocs.cs.ualberta.ca/~santanad/aiide/program.html).
+
 ## Getting Started
 
 This section includes the necessary steps to get TOAD-GUI running on your system.
@@ -25,6 +32,9 @@ and installing the packages there.
 $ pip3 install -r requirements.txt -f "https://download.pytorch.org/whl/torch_stable.html"
 ```
 Make sure you use the `pip3` that belongs to your previously defined virtual environment.
+
+The GUI is made with [Tkinter](https://wiki.python.org/moin/TkInter), which from Python 3.7 onwards is installed by default.
+If you don't have it installed because of an older version, follow the instructions [here](https://tkdocs.com/tutorial/install.html).
 
 ### Java
 
@@ -47,6 +57,9 @@ When running TOAD-GUI you can:
 * ![gear toad](icons/gear_toad.png) Generate a level of the size defined in the entries below
 * ![save button](icons/save_button.png) Save the currently loaded level level to a `.txt` or `.png` image file
 * ![play button](icons/play_button.png) Play the currently loaded level
+
+**NOTE:** When a generator is opened, it will not show any files in the dialog window. 
+That is intended behavior for `askdirectory()` of tkinter. Just navigate to the correct path and click "Open" regardless.
 
 When a level is loaded, **right clicking** a point in the preview will allow you to change the token at that specific spot.
 If you resample the level, any changes made will be lost.
@@ -83,6 +96,21 @@ This should be done after resampling, as resampling will regenerate the level fr
 
 If you are interested in training your own Generator, refer to the [TOAD-GAN Github](https://github.com/Mawiszus/TOAD-GAN) and copy the folder of your trained generator into the `generators/` folder.
 You should now be able to open it just like the provided generators.
+
+The necessary files are:
+```
+generators.pth
+noise_amplitudes.pth
+noise_maps.pth
+num_layer.pth
+reals.pth
+token_list.pth
+```
+Any other files can be deleted if you want to keep your folders tidy.
+
+**NOTE:** When a generator is opened, it will not show these files in the dialog window. 
+That is intended behavior for `askdirectory()` of tkinter. Just navigate to the correct path and click "Open" regardless.
+
 
 ## Known Bugs
 
