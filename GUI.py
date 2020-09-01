@@ -309,7 +309,7 @@ def TOAD_GUI():
             while True:
                 result = game.gameLoop(''.join(level_obj.ascii_level), 200, 0, True, 30)
                 perc = int(result.getCompletionPercentage() * 100)
-                error_msg.set("Level Played~. Completion Percentage: %d%%" % perc)
+                error_msg.set("Level Played. Completion Percentage: %d%%" % perc)
         except Exception:
             error_msg.set("Level Play was interrupted.")
             is_loaded.set(True)
