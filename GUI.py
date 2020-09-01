@@ -312,6 +312,8 @@ def TOAD_GUI():
                 error_msg.set("Level Played~. Completion Percentage: %d%%" % perc)
         except Exception:
             error_msg.set("Level Play was interrupted unexpectedly.")
+            is_loaded.set(True)
+            use_gen.set(remember_use_gen)
         finally:
             game.getWindow().dispose()
             gateway.java_process.kill()
