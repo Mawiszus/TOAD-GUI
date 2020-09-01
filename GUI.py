@@ -299,18 +299,23 @@ def TOAD_GUI():
         is_loaded.set(False)
         remember_use_gen = use_gen.get()
         use_gen.set(False)
+        # Py4j Java bridge uses Mario AI Framework
+        gateway = JavaGateway.launch_gateway(classpath=MARIO_AI_PATH, die_on_exit=True, redirect_stdout=sys.stdout, redirect_stderr=sys.stderr)
+        game = gateway.jvm.engine.core.MarioGame()
         try:
-            # Py4j Java bridge uses Mario AI Framework
-            gateway = JavaGateway.launch_gateway(classpath=MARIO_AI_PATH, die_on_exit=True)
-            game = gateway.jvm.engine.core.MarioGame()
-            result = game.playGame(''.join(level_obj.ascii_level), 200)
-            game.getWindow().dispose()
-            perc = int(result.getCompletionPercentage() * 100)
-            gateway.java_process.kill()
-            gateway.close()
-            error_msg.set("Level Played. Completion Percentage: %d%%" % perc)
+            game.initVisuals(2.0)
+            agent = gateway.jvm.agents.human.Agent()
+            game.setAgent(agent)
+            while True:
+                result = game.gameLoop(''.join(level_obj.ascii_level), 200, 0, True, 30)
+                perc = int(result.getCompletionPercentage() * 100)
+                error_msg.set("Level Played~. Completion Percentage: %d%%" % perc)
         except Exception:
             error_msg.set("Level Play was interrupted unexpectedly.")
+        finally:
+            game.getWindow().dispose()
+            gateway.java_process.kill()
+            gateway.close()
 
         is_loaded.set(True)
         use_gen.set(remember_use_gen)  # only set use_gen to True if it was previously
