@@ -114,8 +114,13 @@ That is intended behavior for `askdirectory()` of tkinter. Just navigate to the 
 
 ## Known Bugs
 
-* If the level play is quit using the window ('x' button in the corner), an error message regarding py4j will occur.
+* If the level play is quit using the window ('x' button in the corner), an **error message regarding py4j** will occur.
 In spite of that, the program should continue running normally.
+
+
+* If you have two monitors with different resolutions, the GUI and the Java window **might not be displayed in the correct resolution**.
+Try moving the windows to the monitor with the other resolution if you encounter this problem.
+You can also change the DPI awareness for the program in the beginning of GUI.py.
 
 ## Built With
 

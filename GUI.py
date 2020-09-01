@@ -27,8 +27,8 @@ if platform.system() == "Windows":
     my_appid = u'toad-gui.1.0'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(my_appid)
 
-    # Make DPI aware - if size is too small or weird turn off
-    ctypes.windll.shcore.SetProcessDpiAwareness(True)
+    # Make DPI aware - if size is too small or weird turn on/off
+    # ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
 
 # Validate Function for Entries
