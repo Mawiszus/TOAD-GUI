@@ -39,7 +39,7 @@ If you don't have it installed because of an older version, follow the instructi
 ### Java
 
 TOAD-GUI uses the [Mario-AI-Framework](https://github.com/amidos2006/Mario-AI-Framework) to play the generated levels.
-For the Framework to run, [Java](https://www.java.com/de/download/) needs to be installed.
+For the Framework to run, [Java](https://www.java.com/de/download/) 11 or later needs to be installed.
 
 ## Running TOAD-GUI
 
