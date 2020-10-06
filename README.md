@@ -1,3 +1,14 @@
+If you are using this code in your own project, please cite our paper:
+
+```
+@inproceedings{awiszus2020toadgan,
+  title={TOAD-GAN: Coherent Style Level Generation from a Single Example},
+  author={Awiszus, Maren and Schubert, Frederik and Rosenhahn, Bodo},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence and Interactive Digital Entertainment},
+  year={2020}
+}
+```
+
 # TOAD-GUI
 
 **TOAD-GUI** is a Framework with which _Super Mario Bros._ levels can be randomly generated, loaded, saved, edited and played using a graphical user interface.
