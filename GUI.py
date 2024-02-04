@@ -10,6 +10,7 @@ import threading
 import queue
 import torch
 import math
+import sys
 
 from utils.scrollable_image import ScrollableImage
 from utils.tooltip import Tooltip
