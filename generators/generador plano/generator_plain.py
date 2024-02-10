@@ -40,28 +40,18 @@ def generador_pared():
     ruta_originals = os.path.join(directorio_actual, "..", "levels", "originals")
     ruta_archivo = os.path.join(ruta_originals, "lvl_pared.txt")
 
+    columnas_pared = [13, 32, 50, 132]
+
     with open(ruta_archivo, 'w') as archivo:
         cuadricula = ''
         for fila in range(23):
             for columna in range(203):
-                if fila <= 20 and columna != 13:
+                if fila <= 20 and columna not in columnas_pared:
                     cuadricula += '-'
                 else:
                     cuadricula += 'X'
             cuadricula += '\n'
         archivo.write(cuadricula)
-
-def validador_simple(lvl):
-
-    es_pasable = False
-
-    with open(lvl, 'r') as archivo:
-        for fila in archivo:
-            if fila[0] == 'X':
-                if '-' in fila:
-                    return es_pasable
-    
-    return True
 
 
 if __name__=='__main__':
@@ -72,5 +62,4 @@ if __name__=='__main__':
     generador_dummy()
     generador_foso()
     generador_pared()
-    print(validador_simple(ruta_archivo))
         
