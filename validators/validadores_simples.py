@@ -1,6 +1,6 @@
 import os
 
-def validar_foso(lvl):
+def validar_foso_pasable(lvl):
 
     matriz_transpuesta = transpose_file(lvl)
     lista_fosos = []
@@ -21,6 +21,30 @@ def validar_foso(lvl):
 
     return es_pasable
 
+def validar_pared_pasable(lvl):
+
+    matriz_transpuesta = transpose_file(lvl)
+    es_pasable = True
+
+    for i in range(len(matriz_transpuesta) - 1):
+
+        #longitud de la pared en la columna actual
+        fila_invertida = matriz_transpuesta[i][::-1]
+        encontrar_hueco = fila_invertida.find('-')
+        longitud_pared = fila_invertida[:encontrar_hueco].count('X')
+
+        #longitud de la pared en la columna siguiente
+        fila_invertida_siguiente = ''.join(reversed(matriz_transpuesta[i + 1]))
+        encontrar_hueco_siguiente = fila_invertida_siguiente.find('-')
+        longitud_pared_siguiente = fila_invertida_siguiente[:encontrar_hueco_siguiente].count('X')
+
+        #Comprueba si la diferencia de longitudes de las paredes es mayor que el salto más alto de mario
+        if (longitud_pared - longitud_pared_siguiente) > 4:
+            es_pasable = False
+            break
+
+    return es_pasable
+
 def transpose_file(input_file):
         
     with open(input_file, 'r') as file:
@@ -37,6 +61,8 @@ if __name__=='__main__':
 
     directorio_actual = str(os.getcwd)
     ruta_originals = os.path.join(directorio_actual, "..", "levels", "originals")
-    ruta_archivo = os.path.join(ruta_originals, "lvl_foso.txt")
+    ruta_archivo = os.path.join(ruta_originals, "lvl_pared.txt")
 
-    print(validar_foso(ruta_archivo))
+    print(validar_pared_pasable(ruta_archivo))
+
+
