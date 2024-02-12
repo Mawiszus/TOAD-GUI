@@ -1,10 +1,11 @@
 import os
 
-def validar_foso_pasable(lvl):
+def validar_fosos_pasables(lvl):
 
     matriz_transpuesta = transpose_file(lvl)
     lista_fosos = []
     es_pasable = False
+    distancia_salto_horizontal_max = 11
 
     #Comprobar longitud de los fosos del mapa
     for i, fila_transpuesta in enumerate(matriz_transpuesta):
@@ -16,14 +17,15 @@ def validar_foso_pasable(lvl):
             lista_fosos.append(contador_filas)
 
     #Comprobar si alguna de las longitudes es mayor que la distancia de salto de mario
-    if all(n <= 8 for n in lista_fosos):
+    if all(n <= distancia_salto_horizontal_max for n in lista_fosos):
         es_pasable = True
 
     return es_pasable
 
-def validar_pared_pasable(lvl):
+def validar_paredes_pasables(lvl):
 
     matriz_transpuesta = transpose_file(lvl)
+    distancia_salto_vertical_max = 4
     es_pasable = True
 
     for i in range(len(matriz_transpuesta) - 1):
@@ -39,7 +41,7 @@ def validar_pared_pasable(lvl):
         longitud_pared_siguiente = fila_invertida_siguiente[:encontrar_hueco_siguiente].count('X')
 
         #Comprueba si la diferencia de longitudes de las paredes es mayor que el salto más alto de mario
-        if (longitud_pared - longitud_pared_siguiente) > 4:
+        if (longitud_pared - longitud_pared_siguiente) > distancia_salto_vertical_max:
             es_pasable = False
             break
 
@@ -61,8 +63,10 @@ if __name__=='__main__':
 
     directorio_actual = str(os.getcwd)
     ruta_originals = os.path.join(directorio_actual, "..", "levels", "originals")
-    ruta_archivo = os.path.join(ruta_originals, "lvl_pared.txt")
+    ruta_archivo_pared = os.path.join(ruta_originals, "lvl_pared.txt")
+    ruta_archivo_foso = os.path.join(ruta_originals, "lvl_foso.txt")
 
-    print(validar_pared_pasable(ruta_archivo))
+    print(validar_paredes_pasables(ruta_archivo_pared))
+    print(validar_fosos_pasables(ruta_archivo_foso))
 
 
