@@ -1,8 +1,16 @@
 import os
-from utils.support_functions import comprobar_limite_columnas
 
 directorio_actual = str(os.getcwd)
 ruta_originals = os.path.join(directorio_actual, "..", "levels", "originals")
+
+def comprobar_limite_columnas(lista, limite):
+    """ 
+     Comprueba que ningun número de la lista sobrepasa el limite que se le pasa como parametro
+    """
+    for numero in lista:
+        if numero > limite:
+            return False  
+    return True  
 
 def generador_dummy(num_filas = 20, num_columnas = 200, ancho_suelo = 2):
 
@@ -34,7 +42,7 @@ def generador_foso(num_filas = 20, num_columnas = 200, ancho_suelo = 2):
             cuadricula += '\n'
         archivo.write(cuadricula)
 
-def generador_pared(num_filas = 20, num_columnas = 200, ancho_suelo = 2, columnas_pared = [10, 15, 40, 201]):
+def generador_pared(num_filas = 20, num_columnas = 200, ancho_suelo = 2, columnas_pared = [10, 15, 40, 180]):
 
     ruta_archivo = os.path.join(ruta_originals, "lvl_pared.txt")
 
@@ -56,4 +64,4 @@ def generador_pared(num_filas = 20, num_columnas = 200, ancho_suelo = 2, columna
 if __name__=='__main__':
 
     generador_foso(10,130,3)
-    generador_pared(10, 140, 4)
+    generador_pared(10, 200, 4)

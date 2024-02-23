@@ -1,11 +1,11 @@
 import os
+from constantes import *
 
 def validar_fosos_pasables(lvl):
 
     matriz_transpuesta = transpose_file(lvl)
     lista_fosos = []
     es_pasable = False
-    distancia_salto_horizontal_max = 11
 
     #Comprobar longitud de los fosos del mapa
     for i, fila_transpuesta in enumerate(matriz_transpuesta):
@@ -25,7 +25,6 @@ def validar_fosos_pasables(lvl):
 def validar_paredes_pasables(lvl):
 
     matriz_transpuesta = transpose_file(lvl)
-    distancia_salto_vertical_max = 4
     es_pasable = True
 
     for i in range(len(matriz_transpuesta) - 1):
