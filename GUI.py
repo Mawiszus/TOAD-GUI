@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
+import tkinter as tk
 from PIL import ImageTk, Image, ImageDraw
 from py4j.java_gateway import JavaGateway
 import os
@@ -13,6 +14,7 @@ import math
 import sys
 
 from utils.scrollable_image import ScrollableImage
+from generators.generador_plano.generator_plain import dummy_generator, pit_lvl_generator, wall_lvl_generator
 from utils.tooltip import Tooltip
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token, ascii_to_one_hot_level
 from utils.level_image_gen import LevelImageGen
@@ -335,6 +337,98 @@ def TOAD_GUI():
     # Displays loaded path
     fpath_label = ttk.Label(settings, textvariable=load_string_gen, width=100)
 
+    #~method to open a window when dummy generator button is clicked
+
+    def generate_lvl_dummy(rows, columns, floor_width):
+
+        path_lvl = dummy_generator(rows, columns, floor_width)
+
+        error_msg.set("Loading level...")
+        is_loaded.set(False)
+        use_gen.set(False)
+
+        load_string_gen.set('Path: ' + path_lvl)
+        folder, lname = os.path.split(path_lvl)
+
+        # Load level
+        lev, tok = read_level_from_file(folder, lname)
+
+        level_obj.oh_level = torch.Tensor(lev)  # casting to Tensor to keep consistency with generated levels
+        level_obj.ascii_level = one_hot_to_ascii_level(lev, tok)
+
+        # Check if a Mario token exists - if not, we need to place one
+        m_exists = False
+        for line in level_obj.ascii_level:
+            if 'M' in line:
+                m_exists = True
+        if not m_exists:
+            level_obj.ascii_level = place_a_mario_token(level_obj.ascii_level)
+        level_obj.tokens = tok
+
+        img = ImageTk.PhotoImage(ImgGen.render(level_obj.ascii_level))
+        level_obj.image = img
+
+        level_obj.scales = None
+        level_obj.noises = None
+
+        level_l.set(lev.shape[-1])
+        level_h.set(lev.shape[-2])
+
+        is_loaded.set(True)
+        use_gen.set(False)
+        error_msg.set("Level loaded")
+
+    def open_generate_dummy_window():
+
+        secondary_window = tk.Toplevel(settings)
+        secondary_window.title("Secondary window")
+
+        # Agregar tres botones a la ventana secundaria
+        button1 = ttk.Button(secondary_window, text="Generate dummy level", command=dummy_parametres_window)
+        button1.pack(pady=10)
+
+        button2 = ttk.Button(secondary_window, text="Generate dummy level with a pit", command=lambda: print("Botón 2 presionado"))
+        button2.pack(pady=10)
+
+        button3 = ttk.Button(secondary_window, text="Generate dummy level with a wall", command=lambda: print("Botón 3 presionado"))
+        button3.pack(pady=10)
+
+    def dummy_parametres_window():
+
+        def do_event(event):
+
+            rows = int(entry_rows.get())
+            columns = int(entry_columns.get())
+            floor_width = int(entry_floor_width.get())
+
+            generate_lvl_dummy(rows, columns, floor_width)
+
+        secondary_window = tk.Toplevel(settings)
+        secondary_window.title("Secondary Window")
+
+        label1 = ttk.Label(secondary_window, text="Number of Rows:")
+        label1.grid(row=0, column=0, padx=10, pady=5)
+        entry_rows = ttk.Entry(secondary_window)
+        entry_rows.grid(row=0, column=1, padx=10, pady=5)
+
+        label2 = ttk.Label(secondary_window, text="Number of Columns:")
+        label2.grid(row=1, column=0, padx=10, pady=5)
+        entry_columns = ttk.Entry(secondary_window)
+        entry_columns.grid(row=1, column=1, padx=10, pady=5)
+
+        label3 = ttk.Label(secondary_window, text="Floor Width:")
+        label3.grid(row=2, column=0, padx=10, pady=5)
+        entry_floor_width = ttk.Entry(secondary_window)
+        entry_floor_width.grid(row=2, column=1, padx=10, pady=5)
+
+        entry_columns.bind("<Return>", do_event)
+        entry_rows.bind("<Return>", do_event)
+        entry_floor_width.bind("<Return>", do_event)
+
+    def dummy_pit_parameter_window():
+        pass
+
+
     # Top Buttons
     load_lev_button = ttk.Button(settings, compound='top', image=load_level_icon, width=35,
                                  text='Open Level', command=lambda: spawn_thread(q, load_level))
@@ -344,6 +438,7 @@ def TOAD_GUI():
                              text='Save Level/Image', state='disabled', command=lambda: spawn_thread(q, save_txt))
     gen_button = ttk.Button(settings, compound='top', image=generate_level_icon,
                             text='Generate level', state='disabled', command=lambda: spawn_thread(q, generate))
+    gen_dummy = ttk.Button(settings, compound='top',text='Generate dummy level', width=35, command=open_generate_dummy_window)
 
     # Size Entries
     size_frame = ttk.Frame(settings, padding=(1, 1, 1, 1))
@@ -464,6 +559,7 @@ def TOAD_GUI():
     save_button.grid(column=2, row=4, sticky=(N, S, E, W), padx=5, pady=5)
     image_label.grid(column=0, row=6, columnspan=4, sticky=(N, E, W), padx=5, pady=8)
     p_c_frame.grid(column=1, row=7, columnspan=2, sticky=(N, S, E, W), padx=5, pady=5)
+    gen_dummy.grid(column=0, row=90, columnspan=4, sticky=(S, E, W), padx=5, pady=5)
     fpath_label.grid(column=0, row=99, columnspan=4, sticky=(S, E, W), padx=5, pady=5)
     error_label.grid(column=0, row=100, columnspan=4, sticky=(S, E, W), padx=5, pady=1)
     size_frame.grid(column=1, row=5, columnspan=1, sticky=(N, S), padx=5, pady=2)
