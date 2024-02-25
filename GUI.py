@@ -339,9 +339,7 @@ def TOAD_GUI():
 
     #~method to open a window when dummy generator button is clicked
 
-    def generate_lvl_dummy(rows, columns, floor_width):
-
-        path_lvl = dummy_generator(rows, columns, floor_width)
+    def generate_lvl_dummy(path_lvl):
 
         error_msg.set("Loading level...")
         is_loaded.set(False)
@@ -387,10 +385,10 @@ def TOAD_GUI():
         button1 = ttk.Button(secondary_window, text="Generate dummy level", command=dummy_parametres_window)
         button1.pack(pady=10)
 
-        button2 = ttk.Button(secondary_window, text="Generate dummy level with a pit", command=lambda: print("Botón 2 presionado"))
+        button2 = ttk.Button(secondary_window, text="Generate dummy level with a pit", command=dummy_pit_parameter_window)
         button2.pack(pady=10)
 
-        button3 = ttk.Button(secondary_window, text="Generate dummy level with a wall", command=lambda: print("Botón 3 presionado"))
+        button3 = ttk.Button(secondary_window, text="Generate dummy level with a wall", command=dummy_wall_parameter_window)
         button3.pack(pady=10)
 
     def dummy_parametres_window():
@@ -400,8 +398,9 @@ def TOAD_GUI():
             rows = int(entry_rows.get())
             columns = int(entry_columns.get())
             floor_width = int(entry_floor_width.get())
+            path_lvl = dummy_generator(rows, columns, floor_width)
 
-            generate_lvl_dummy(rows, columns, floor_width)
+            generate_lvl_dummy(path_lvl)
 
         secondary_window = tk.Toplevel(settings)
         secondary_window.title("Secondary Window")
@@ -426,7 +425,92 @@ def TOAD_GUI():
         entry_floor_width.bind("<Return>", do_event)
 
     def dummy_pit_parameter_window():
-        pass
+        
+        def do_event(event):
+
+            rows = int(entry_rows.get())
+            columns = int(entry_columns.get())
+            floor_width = int(entry_floor_width.get())
+            pit_position = int(entry_pit_position.get())
+            pit_length = int(entry_pit_length.get())
+            path_lvl = pit_lvl_generator(rows, columns, floor_width, pit_position, pit_length)
+
+            generate_lvl_dummy(path_lvl)
+
+        secondary_window = tk.Toplevel(settings)
+        secondary_window.title("Secondary Window")
+
+        label1 = ttk.Label(secondary_window, text="Number of Rows:")
+        label1.grid(row=0, column=0, padx=10, pady=5)
+        entry_rows = ttk.Entry(secondary_window)
+        entry_rows.grid(row=0, column=1, padx=10, pady=5)
+
+        label2 = ttk.Label(secondary_window, text="Number of Columns:")
+        label2.grid(row=1, column=0, padx=10, pady=5)
+        entry_columns = ttk.Entry(secondary_window)
+        entry_columns.grid(row=1, column=1, padx=10, pady=5)
+
+        label3 = ttk.Label(secondary_window, text="Floor Width:")
+        label3.grid(row=2, column=0, padx=10, pady=5)
+        entry_floor_width = ttk.Entry(secondary_window)
+        entry_floor_width.grid(row=2, column=1, padx=10, pady=5)
+
+        label4 = ttk.Label(secondary_window, text="Pit Position:")
+        label4.grid(row=3, column=0, padx=10, pady=5)
+        entry_pit_position = ttk.Entry(secondary_window)
+        entry_pit_position.grid(row=3, column=1, padx=10, pady=5)
+
+        label5 = ttk.Label(secondary_window, text="Pit length:")
+        label5.grid(row=4, column=0, padx=10, pady=5)
+        entry_pit_length = ttk.Entry(secondary_window)
+        entry_pit_length.grid(row=4, column=1, padx=10, pady=5)
+
+        entry_columns.bind("<Return>", do_event)
+        entry_rows.bind("<Return>", do_event)
+        entry_floor_width.bind("<Return>", do_event)
+        entry_pit_position.bind("<Return>", do_event)
+        entry_pit_length.bind("<Return>", do_event)
+
+    def dummy_wall_parameter_window():
+        
+        def do_event(event):
+
+            rows = int(entry_rows.get())
+            columns = int(entry_columns.get())
+            floor_width = int(entry_floor_width.get())
+            wall_columns = entry_wall_positions.get().split(',')
+            wall_columns = [int(num) for num in wall_columns]
+            path_lvl = wall_lvl_generator(rows, columns, floor_width, wall_columns)
+
+            generate_lvl_dummy(path_lvl)
+
+        secondary_window = tk.Toplevel(settings)
+        secondary_window.title("Secondary Window")
+
+        label1 = ttk.Label(secondary_window, text="Number of Rows:")
+        label1.grid(row=0, column=0, padx=10, pady=5)
+        entry_rows = ttk.Entry(secondary_window)
+        entry_rows.grid(row=0, column=1, padx=10, pady=5)
+
+        label2 = ttk.Label(secondary_window, text="Number of Columns:")
+        label2.grid(row=1, column=0, padx=10, pady=5)
+        entry_columns = ttk.Entry(secondary_window)
+        entry_columns.grid(row=1, column=1, padx=10, pady=5)
+
+        label3 = ttk.Label(secondary_window, text="Floor Width:")
+        label3.grid(row=2, column=0, padx=10, pady=5)
+        entry_floor_width = ttk.Entry(secondary_window)
+        entry_floor_width.grid(row=2, column=1, padx=10, pady=5)
+
+        label4 = ttk.Label(secondary_window, text="Wall positions:")
+        label4.grid(row=3, column=0, padx=10, pady=5)
+        entry_wall_positions = ttk.Entry(secondary_window)
+        entry_wall_positions.grid(row=3, column=1, padx=10, pady=5)
+
+        entry_columns.bind("<Return>", do_event)
+        entry_rows.bind("<Return>", do_event)
+        entry_floor_width.bind("<Return>", do_event)
+        entry_wall_positions.bind("<Return>", do_event)
 
 
     # Top Buttons
