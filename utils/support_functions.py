@@ -1,8 +1,8 @@
-def comprobar_limite_columnas(lista, limite):
+def check_column_limit(list, limit):
     """ 
-     Comprueba que ningun número de la lista sobrepasa el limite que se le pasa como parametro
+     Check that any number of the list surpasses the limit given
     """
-    for numero in lista:
-        if numero > limite:
+    for number in list:
+        if number > limit:
             return False  
     return True  

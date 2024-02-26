@@ -4,6 +4,7 @@ from tkinter import filedialog as fd
 import tkinter as tk
 from PIL import ImageTk, Image, ImageDraw
 from py4j.java_gateway import JavaGateway
+from tkinter import messagebox
 import os
 import platform
 import time
@@ -19,6 +20,7 @@ from utils.tooltip import Tooltip
 from utils.level_utils import read_level_from_file, one_hot_to_ascii_level, place_a_mario_token, ascii_to_one_hot_level
 from utils.level_image_gen import LevelImageGen
 from utils.toad_gan_utils import load_trained_pyramid, generate_sample, TOADGAN_obj
+from utils.support_functions import check_column_limit
 
 # Path to the AI Framework jar for Playing levels
 MARIO_AI_PATH = os.path.abspath(os.path.join(os.path.curdir, "Mario-AI-Framework/mario-1.0-SNAPSHOT.jar"))
@@ -376,12 +378,12 @@ def TOAD_GUI():
         use_gen.set(False)
         error_msg.set("Level loaded")
 
+    #Ventanas de generadores dummy
     def open_generate_dummy_window():
 
         secondary_window = tk.Toplevel(settings)
         secondary_window.title("Secondary window")
 
-        # Agregar tres botones a la ventana secundaria
         button1 = ttk.Button(secondary_window, text="Generate dummy level", command=dummy_parametres_window)
         button1.pack(pady=10)
 
@@ -433,9 +435,15 @@ def TOAD_GUI():
             floor_width = int(entry_floor_width.get())
             pit_position = int(entry_pit_position.get())
             pit_length = int(entry_pit_length.get())
-            path_lvl = pit_lvl_generator(rows, columns, floor_width, pit_position, pit_length)
 
-            generate_lvl_dummy(path_lvl)
+            #Check parametres are correct
+            if pit_position >= columns:
+                messagebox.showerror("Error", "The position for the pit is out of range")
+            elif pit_position + pit_length > columns:
+                messagebox.showerror("Error", "The length configuration is out of range for the column settings")
+            else:
+                path_lvl = pit_lvl_generator(rows, columns, floor_width, pit_position, pit_length)
+                generate_lvl_dummy(path_lvl)
 
         secondary_window = tk.Toplevel(settings)
         secondary_window.title("Secondary Window")
@@ -480,7 +488,12 @@ def TOAD_GUI():
             floor_width = int(entry_floor_width.get())
             wall_columns = entry_wall_positions.get().split(',')
             wall_columns = [int(num) for num in wall_columns]
-            path_lvl = wall_lvl_generator(rows, columns, floor_width, wall_columns)
+
+            #Check parametres are correct
+            if not check_column_limit(wall_columns, columns):
+                messagebox.showerror("Error", "One of the columns is out of the limit of columns of the level")
+            else:
+                path_lvl = wall_lvl_generator(rows, columns, floor_width, wall_columns)
 
             generate_lvl_dummy(path_lvl)
 
