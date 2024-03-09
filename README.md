@@ -49,12 +49,11 @@ $ pip3 install -r requirements.txt -f "https://download.pytorch.org/whl/torch_st
 Make sure you use the `pip3` that belongs to your previously defined virtual environment.
 
 The GUI is made with [Tkinter](https://wiki.python.org/moin/TkInter), which from Python 3.7 onwards is installed by default.
-
 If you don't have it installed because of an older version, follow the instructions [here](https://tkdocs.com/tutorial/install.html).
 
 #### Conda
 
-Alternatively, you can also install an environment with [`conda`](https://docs.anaconda.com/free/anaconda/install/):
+Alternatively, you can install an environment with [`conda`](https://docs.anaconda.com/free/anaconda/install/):
 
 You can modify the conda `environment.yml` file, to e.g. use a different Python version than 3.11.5.
 
@@ -63,7 +62,7 @@ $ conda env create -f environment.yml
 $ conda activate toad-gui
 ```
 
-If the program fails to start, ensure that `torch` is **not** installed globally, as the global version might take preference over the on in the environment.
+If the program fails to start, ensure that `torch` is **not** installed globally, as the global version might take precedence over the on in the environment.
 
 ### Java
 
