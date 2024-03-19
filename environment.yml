@@ -1,0 +1,13 @@
+name: toad-gui
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11.5
+  - pip
+  - pytorch
+  - pip:
+    - numpy
+    - Pillow
+    - py4j
